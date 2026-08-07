@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="RescueHub.API/RescueHub.API.csproj" />
+  <Project Path="RescueHub.Application/RescueHub.Application.csproj" />
+  <Project Path="RescueHub.Domain/RescueHub.Domain.csproj" />
+  <Project Path="RescueHub.Infrastructure.SqlServer/RescueHub.Infrastructure.SqlServer.csproj" />
+</Solution>
