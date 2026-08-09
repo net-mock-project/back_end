@@ -11,8 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Contracts\" />
-    <Folder Include="Features\" />
+    <Folder Include="Features\Users\UpdateProfile\" />
     <Folder Include="Mappings\" />
   </ItemGroup>
 

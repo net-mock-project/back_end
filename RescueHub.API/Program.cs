@@ -1,22 +1,38 @@
+using RescueHub.API;
+using RescueHub.Infrastructure.SqlServer;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Đăng ký Controller, Global Exception Handler,
+// ApiResponseWrapperFilter...
+builder.Services.AddPresentation();
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Đăng ký:
+// ApplicationDbContext
+// IUserRepository -> UserRepository
+// IUserService -> UserService
+builder.Services.AddInfrastructure(
+    builder.Configuration);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// Kích hoạt Global Exception Handler
+app.UseExceptionHandler();
+
 app.UseHttpsRedirection();
+
+// Nếu team đã cấu hình JWT Authentication
+// thì UseAuthentication phải đứng trước UseAuthorization
+// app.UseAuthentication();
 
 app.UseAuthorization();
 

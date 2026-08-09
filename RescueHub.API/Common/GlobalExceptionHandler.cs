@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,37 +12,75 @@ using Microsoft.Extensions.Logging;
 namespace RescueHub.API.Common
 {
     /// <summary>
-    /// Bắt MỌI exception chưa được xử lý và trả về đúng envelope ApiResponse.
+    /// Bắt mọi exception chưa được xử lý và trả về đúng envelope ApiResponse.
     /// Nhờ đó client luôn nhận cùng một hình dạng kể cả khi có lỗi.
     /// </summary>
     public class GlobalExceptionHandler : IExceptionHandler
     {
         private readonly ILogger<GlobalExceptionHandler> _logger;
 
-        public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+        public GlobalExceptionHandler(
+            ILogger<GlobalExceptionHandler> logger)
         {
             _logger = logger;
         }
 
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+        public async ValueTask<bool> TryHandleAsync(
+            HttpContext httpContext,
+            Exception exception,
+            CancellationToken cancellationToken)
         {
             var (statusCode, messages) = exception switch
             {
-                NotFoundException => (HttpStatusCode.NotFound, new[] { exception.Message }),
-                // Domain ném ArgumentException khi dữ liệu đầu vào không hợp lệ.
-                ArgumentException => (HttpStatusCode.BadRequest, new[] { exception.Message }),
-                _ => (HttpStatusCode.InternalServerError, new[] { "An unexpected error occurred." })
+                // Exception cũ của Application
+                NotFoundException =>
+                    (
+                        HttpStatusCode.NotFound,
+                        new[] { exception.Message }
+                    ),
+
+                // Domain Service dùng exception này khi không tìm thấy User
+                KeyNotFoundException =>
+                    (
+                        HttpStatusCode.NotFound,
+                        new[] { exception.Message }
+                    ),
+
+                // Dữ liệu đầu vào không hợp lệ
+                ArgumentException =>
+                    (
+                        HttpStatusCode.BadRequest,
+                        new[] { exception.Message }
+                    ),
+
+                // Các lỗi ngoài dự kiến
+                _ =>
+                    (
+                        HttpStatusCode.InternalServerError,
+                        new[] { "An unexpected error occurred." }
+                    )
             };
 
+            // Chỉ log chi tiết lỗi 500
             if (statusCode == HttpStatusCode.InternalServerError)
             {
-                // Chỉ log chi tiết cho lỗi ngoài dự kiến; không rò rỉ thông tin ra client.
-                _logger.LogError(exception, "Unhandled exception while processing {Path}", httpContext.Request.Path);
+                _logger.LogError(
+                    exception,
+                    "Unhandled exception while processing {Path}",
+                    httpContext.Request.Path);
             }
 
-            var response = ApiResponse.Fail(statusCode, messages);
-            httpContext.Response.StatusCode = (int)statusCode;
-            await httpContext.Response.WriteAsJsonAsync(response, cancellationToken);
+            var response =
+                ApiResponse.Fail(
+                    statusCode,
+                    messages);
+
+            httpContext.Response.StatusCode =
+                (int)statusCode;
+
+            await httpContext.Response.WriteAsJsonAsync(
+                response,
+                cancellationToken);
 
             return true;
         }

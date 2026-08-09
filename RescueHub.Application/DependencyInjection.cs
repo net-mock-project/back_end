@@ -1,13 +1,21 @@
 ﻿using System.Reflection;
-using RescueHub.Domain.Interfaces;
-using RescueHub.Domain.Services;
-using Mapster;
-using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace RescueHub.Application
 {
-    internal class DependencyInjection
+    public static class DependencyInjection
     {
+        public static IServiceCollection AddApplication(
+            this IServiceCollection services)
+        {
+            // Đăng ký các MediatR Handler trong Application project
+            services.AddMediatR(config =>
+            {
+                config.RegisterServicesFromAssembly(
+                    Assembly.GetExecutingAssembly());
+            });
+
+            return services;
+        }
     }
 }
