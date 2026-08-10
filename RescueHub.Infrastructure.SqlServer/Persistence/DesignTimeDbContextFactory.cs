@@ -11,7 +11,7 @@ namespace RescueHub.Infrastructure.SqlServer.Persistence
 
             // Thay chuỗi kết nối dưới đây bằng đúng ConnectionString trong file appsettings.json của dự án API bạn đang dùng
             optionsBuilder.UseSqlServer(
-                "Server=(localdb)\\mssqllocaldb;Database=RescueHubDb;Trusted_Connection=True;MultipleActiveResultSets=true",
+                "Server=.;Database=RescueHubNewDb;Trusted_Connection=True;TrustServerCertificate=True;",
                 x => x.UseNetTopologySuite()
             );
 

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace RescueHub.Domain.Entities.DTOs
+namespace RescueHub.Domain.Entities.RegisterDTOs
 {
     public class RegisterDto
     {

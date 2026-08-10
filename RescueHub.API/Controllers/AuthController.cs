@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using RescueHub.Domain.Entities.DTOs;
+using RescueHub.Domain.Entities.RegisterDTOs;
 using RescueHub.Domain.Interfaces;
 using System.Threading.Tasks;
-
 
 namespace RescueHub.API.Controllers
 {

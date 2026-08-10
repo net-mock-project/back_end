@@ -1,5 +1,5 @@
 // RescueHub.Domain/Services/IAuthService.cs
-using RescueHub.Domain.Entities.DTOs; // hoặc namespace chứa DTO của bạn
+using RescueHub.Domain.Entities.RegisterDTOs; // hoặc namespace chứa DTO của bạn
 
 namespace RescueHub.Domain.Interfaces
 {

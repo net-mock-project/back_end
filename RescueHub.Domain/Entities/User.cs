@@ -16,7 +16,6 @@ namespace RescueHub.Domain.Entities
 
         // --- CÁC CỜ TRẠNG THÁI (RẤT QUAN TRỌNG) ---
         public bool IsVerified { get; set; } = false;          // Đã xác thực OTP thành công chưa?
-        public bool IsProfileCompleted { get; set; } = false; // Đã cập nhật thông tin bổ sung lần đầu chưa?
 
         // --- CÁC THÔNG TIN BỔ SUNG (Lần đăng nhập đầu tiên) ---
         public string? ProfileUrl { get; set; }

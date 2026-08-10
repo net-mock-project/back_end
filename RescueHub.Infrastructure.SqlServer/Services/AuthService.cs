@@ -1,4 +1,4 @@
-using RescueHub.Domain.Entities.DTOs;
+using RescueHub.Domain.Entities.RegisterDTOs;
 using RescueHub.Domain.Entities;
 using RescueHub.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
