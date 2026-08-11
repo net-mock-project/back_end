@@ -1,6 +1,5 @@
 ﻿using RescueHub.API.Common;
 using Mapster;
-using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace RescueHub.API
