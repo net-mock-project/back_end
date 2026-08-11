@@ -2,23 +2,30 @@
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
+using RescueHub.Domain.Interfaces;
+using RescueHub.Domain.Services;
 
 namespace RescueHub.Application
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddApplication(this IServiceCollection services)
+        public static IServiceCollection AddApplication(
+            this IServiceCollection services)
         {
-            // Register MediatR
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+            // Đăng ký MediatR
+            services.AddMediatR(cfg =>
+                cfg.RegisterServicesFromAssembly(
+                    Assembly.GetExecutingAssembly()));
 
-            // Register Mapster Config
+            // Đăng ký Mapster
             var config = TypeAdapterConfig.GlobalSettings;
             config.Scan(Assembly.GetExecutingAssembly());
+
             services.AddSingleton(config);
             services.AddScoped<IMapper, Mapper>();
 
-            // Register Domain Services (Commands/Queries gọi qua Domain, Domain gọi Repository)
+            // Đăng ký Domain Service
+            services.AddScoped<IUserService, UserService>();
 
             return services;
         }

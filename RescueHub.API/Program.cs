@@ -1,8 +1,16 @@
+using RescueHub.API;
+using RescueHub.Application;
+using RescueHub.Infrastructure.SqlServer;
+
 using RescueHub.API.Common;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Đăng ký các layer
+builder.Services.AddPresentation();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructureSqlServer(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddCorsPolicy(builder.Configuration);
@@ -13,7 +21,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Xử lý exception toàn cục
+app.UseExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
