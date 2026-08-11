@@ -8,6 +8,6 @@ namespace RescueHub.Domain.Interfaces
         Task<User?> GetByIdAsync(Guid userId);
 
         // Cập nhật User
-        Task UpdateAsync(User user);
+        Task<bool> UpdateAsync(User user);
     }
 }

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using MapsterMapper;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RescueHub.API.Models;
@@ -11,13 +12,15 @@ namespace RescueHub.API.Controllers
     [ApiController]
     [Route("api/me")]
     [Authorize]
-    public class MeController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly ISender _sender;
+        private readonly IMapper _mapper;
 
-        public MeController(ISender sender)
+        public UsersController(ISender sender, IMapper mapper)
         {
             _sender = sender;
+            _mapper = mapper;
         }
 
         // Cập nhật thông tin Profile của User hiện tại
@@ -32,11 +35,13 @@ namespace RescueHub.API.Controllers
                 return Unauthorized();
             }
 
-            var command = new UpdateProfileCommand(
-                userId.Value,
-                request.FullName,
-                request.Phone,
-                request.Province);
+
+            // Map Request sang Command và gắn UserId từ token
+            var command = _mapper.Map<UpdateProfileCommand>(request)
+                with
+            {
+                UserId = userId.Value
+            };
 
             var result = await _sender.Send(command);
 

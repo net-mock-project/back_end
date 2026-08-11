@@ -1,4 +1,5 @@
 ﻿using RescueHub.Domain.Common;
+using RescueHub.Domain.Enums;
 
 namespace RescueHub.Domain.Entities
 {
@@ -17,6 +18,10 @@ namespace RescueHub.Domain.Entities
         public string Email { get; private set; } = null!;
 
         public string? Phone { get; private set; }
+
+        public DateOnly? DateOfBirth { get; private set; }
+
+        public Gender? Gender { get; private set; }
 
         public string PasswordHash { get; private set; } = null!;
 
@@ -40,6 +45,8 @@ namespace RescueHub.Domain.Entities
             string fullName,
             string email,
             string? phone,
+            DateOnly? dateOfBirth,
+            Gender? gender,
             string passwordHash,
             string status,
             bool isVerified,
@@ -55,6 +62,8 @@ namespace RescueHub.Domain.Entities
             FullName = fullName;
             Email = email;
             Phone = phone;
+            DateOfBirth = dateOfBirth;
+            Gender = gender;
             PasswordHash = passwordHash;
             Status = status;
             IsVerified = isVerified;
@@ -66,7 +75,8 @@ namespace RescueHub.Domain.Entities
         public void UpdateProfile(
             string? fullName,
             string? phone,
-            string? province)
+            DateOnly? dateOfBirth,
+            Gender? gender)
         {
             var isChanged = false;
 
@@ -87,9 +97,15 @@ namespace RescueHub.Domain.Entities
                 isChanged = true;
             }
 
-            if (province != null && province != Province)
+            if (dateOfBirth != null && dateOfBirth != DateOfBirth)
             {
-                Province = province;
+                DateOfBirth = dateOfBirth;
+                isChanged = true;
+            }
+
+            if (gender != null && gender != Gender)
+            {
+                Gender = gender;
                 isChanged = true;
             }
 

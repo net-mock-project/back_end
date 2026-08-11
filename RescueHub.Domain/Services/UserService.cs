@@ -1,4 +1,5 @@
 ﻿using RescueHub.Domain.Entities;
+using RescueHub.Domain.Enums;
 using RescueHub.Domain.Interfaces;
 
 namespace RescueHub.Domain.Services
@@ -17,7 +18,8 @@ namespace RescueHub.Domain.Services
             Guid userId,
             string? fullName,
             string? phone,
-            string? province)
+            DateOnly? dateOfBirth,
+            Gender? gender)
         { 
             var user = await _userRepository.GetByIdAsync(userId);
 
@@ -29,9 +31,13 @@ namespace RescueHub.Domain.Services
             user.UpdateProfile(
                 fullName,
                 phone,
-                province);
+                dateOfBirth,
+                gender);
 
-            await _userRepository.UpdateAsync(user);
+            var isUpdated = await _userRepository.UpdateAsync(user);
+
+            if (!isUpdated)
+                return null;
 
             return user;
         }

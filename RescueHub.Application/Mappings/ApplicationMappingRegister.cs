@@ -1,4 +1,6 @@
 ﻿using Mapster;
+using RescueHub.Application.Contracts;
+using RescueHub.Domain.Entities;
 using RescueHub.Application.Contracts.Querying;
 using RescueHub.Domain.Common.Querying;
 
@@ -17,9 +19,9 @@ namespace RescueHub.Application.Mappings
                 .Map(
                     dest => dest.SortDirection,
                     src => (Domain.Common.Querying.SortDirection)src.SortDirection);
-            // Quan hệ: Entity --> DTO.
 
-            // Add custom mapping rules here as the application grows.
+            // Map Domain Entity sang DTO
+            config.NewConfig<User, UserProfileDto>();
         }
     }
 }

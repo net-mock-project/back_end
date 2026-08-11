@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using MediatR;
 using RescueHub.Application.Contracts;
+using RescueHub.Domain.Enums;
 using RescueHub.Domain.Interfaces;
 
 namespace RescueHub.Application.Features.Users.Commands
@@ -10,7 +11,8 @@ namespace RescueHub.Application.Features.Users.Commands
         Guid UserId,
         string? FullName,
         string? Phone,
-        string? Province
+        DateOnly? DateOfBirth,
+        Gender? Gender
     ) : IRequest<UserProfileDto?>;
 
     // Handler xử lý cập nhật Profile
@@ -33,7 +35,8 @@ namespace RescueHub.Application.Features.Users.Commands
                 request.UserId,
                 request.FullName,
                 request.Phone,
-                request.Province);
+                request.DateOfBirth,
+                request.Gender);
 
             return user?.Adapt<UserProfileDto>();
         }

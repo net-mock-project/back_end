@@ -26,7 +26,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             return MapToDomain(dataModel);
         }
 
-        public async Task UpdateAsync(User user)
+        public async Task<bool> UpdateAsync(User user)
         {
             // Lấy bản ghi hiện tại để cập nhật Profile
             var existing = await _dbContext.Users
@@ -34,15 +34,18 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
 
             if (existing == null)
             {
-                return;
+                return false;
             }
 
             existing.FullName = user.FullName;
             existing.Phone = user.Phone;
-            existing.Province = user.Province;
+            existing.DateOfBirth = user.DateOfBirth;
+            existing.Gender = user.Gender;
             existing.UpdatedAt = user.UpdatedAt;
 
             await _dbContext.SaveChangesAsync();
+
+            return true;
         }
 
         // Chuyển Data Model sang Domain Entity
@@ -71,6 +74,8 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 dataModel.FullName,
                 dataModel.Email,
                 dataModel.Phone,
+                dataModel.DateOfBirth,
+                dataModel.Gender,
                 dataModel.PasswordHash,
                 dataModel.Status,
                 dataModel.IsVerified,

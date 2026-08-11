@@ -1,4 +1,5 @@
 ﻿using RescueHub.Domain.Entities;
+using RescueHub.Domain.Enums;
 
 namespace RescueHub.Domain.Interfaces
 {
@@ -10,6 +11,7 @@ namespace RescueHub.Domain.Interfaces
             Guid userId,
             string? fullName,
             string? phone,
-            string? province);
+            DateOnly? dateOfBirth,
+            Gender? gender);
     }
 }

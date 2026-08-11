@@ -1,4 +1,5 @@
 ﻿using NetTopologySuite.Geometries;
+using RescueHub.Domain.Enums;
 
 namespace RescueHub.Infrastructure.SqlServer.Models
 {
@@ -21,6 +22,10 @@ namespace RescueHub.Infrastructure.SqlServer.Models
         public string Email { get; set; } = null!;
 
         public string? Phone { get; set; }
+
+        public DateOnly? DateOfBirth { get; set; }
+
+        public Gender? Gender { get; set; }
 
         public string PasswordHash { get; set; } = null!;
 
