@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore; // Nhớ thêm namespace này nếu dùng UseSqlServer
 using RescueHub.Domain.Interfaces;
 using RescueHub.Infrastructure.SqlServer.Persistence;
+using RescueHub.Domain.Services;
+using RescueHub.Infrastructure.SqlServer.Repositories;
 using RescueHub.Infrastructure.SqlServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,7 +36,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         x => x.UseNetTopologySuite()
     ));
 
+
+// Đăng ký AuthService để sử dụng trong Controller
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Đăng ký AuthRepository để sử dụng trong AuthService
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+
+// Đăng ký Email Service
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 

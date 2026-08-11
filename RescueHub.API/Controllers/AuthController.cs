@@ -25,17 +25,37 @@ namespace RescueHub.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var success = await _authService.SendOtpAsync(dto.PhoneNumber);
+            var success = await _authService.SendOtpAsync(dto.Email);
 
             if (!success)
             {
-                return BadRequest(new { message = "Số điện thoại này đã được đăng ký hoặc không thể gửi mã lúc này." });
+                return BadRequest(new { message = "Email này đã được đăng ký hoặc không thể gửi mã lúc này." });
             }
 
-            return Ok(new { message = "Mã OTP đã được gửi thành công đến số điện thoại của bạn!" });
+            return Ok(new { message = "Mã OTP đã được gửi thành công đến email của bạn!" });
         }
 
-        // --- API 2: XÁC THỰC OTP VÀ ĐĂNG KÝ CHÍNH THỨC ---
+
+        // --- API 2: GỬI LẠI MÃ OTP ---
+        [HttpPost("resend-otp")]
+        public async Task<IActionResult> ResendOtp([FromBody] SendOtpDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var success = await _authService.ResendOtpAsync(dto.Email);
+
+            if (!success)
+            {
+                return BadRequest(new { message = "Không thể gửi mã OTP mới." });
+            }
+
+            return Ok(new { message = "Mã OTP mới đã được gửi thành công đến email của bạn!" });
+        }
+
+        // --- API 3: XÁC THỰC OTP VÀ ĐĂNG KÝ CHÍNH THỨC ---
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
