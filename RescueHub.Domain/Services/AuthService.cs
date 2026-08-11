@@ -1,67 +1,69 @@
 using RescueHub.Domain.Entities.RegisterDTOs;
 using RescueHub.Domain.Entities;
 using RescueHub.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using RescueHub.Infrastructure.SqlServer.Persistence;
 using BCrypt.Net;
+using RescueHub.Infrastructure.SqlServer.Services;
 
-namespace RescueHub.Infrastructure.SqlServer.Services
+namespace RescueHub.Domain.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IAuthRepository _authRepository;
+        private readonly IEmailService _emailService;
 
-        public AuthService(ApplicationDbContext context)
+        public AuthService(IAuthRepository authRepository, IEmailService emailService)
         {
-            _context = context;
+            _authRepository = authRepository;
+            _emailService = emailService;
         }
 
-        // --- BƯỚC 1: GỬI MÃ OTP ---
-        public async Task<bool> SendOtpAsync(string phoneNumber)
+        // --- BƯỚC 1: GỬI MÃ OTP QUA EMAIL ---
+        public async Task<bool> SendOtpAsync(string email)
         {
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
+            var existingUser = await _authRepository.GetUserByEmailAsync(email);
             if (existingUser != null && existingUser.IsVerified)
                 return false;
 
             string otpCode = new Random().Next(100000, 999999).ToString();
 
             Console.WriteLine($"\n========================================");
-            Console.WriteLine($"[TESTING] Ma OTP cho so {phoneNumber} la: {otpCode}");
+            Console.WriteLine($"[TESTING] Ma OTP cho email {email} la: {otpCode}");
             Console.WriteLine($"========================================\n");
+
+            await _emailService.SendEmailAsync(email, "Mã OTP xác thực tài khoản", $"Mã OTP của bạn là: {otpCode}. Mã này sẽ hết hạn sau 5 phút.");
 
             var otpEntry = new OtpVerification
             {
-                PhoneNumber = phoneNumber,
+                Email = email,
                 Code = otpCode,
                 ExpiredAt = DateTime.UtcNow.AddMinutes(5)
             };
-            _context.OtpVerifications.Add(otpEntry);
-            await _context.SaveChangesAsync();
+
+            await _authRepository.AddOtpAsync(otpEntry);
+            await _authRepository.SaveChangesAsync();
 
             return true;
         }
 
-        
+        // --- GỬI LẠI OTP NẾU NGƯỜI DÙNG YÊU CẦU ---
+        public async Task<bool> ResendOtpAsync (string email)
+        {
+            await _authRepository.RemoveOldOtpAsync(email);
+            return await SendOtpAsync(email);
+        }
+
         // --- BƯỚC 2: XÁC NHẬN OTP VÀ HOÀN TẤT ĐĂNG KÝ ---
         public async Task<string> VerifyAndRegisterAsync(RegisterDto dto)
         {
-            // 1. Kiểm tra xem Email hoặc Số điện thoại đã tồn tại tài khoản chính thức chưa
-            var userExists = await _context.Users.AnyAsync(u => u.Email == dto.Email || u.PhoneNumber == dto.PhoneNumber);
-            if (userExists)
-            {
-                return "UserExists";
-            }
+            
 
-            // 2. Lấy ra mã OTP mới nhất của số điện thoại này từ Database
-            var otpRecord = await _context.OtpVerifications
-                .Where(o => o.PhoneNumber == dto.PhoneNumber)
-                .OrderByDescending(o => o.ExpiredAt)
-                .FirstOrDefaultAsync();
+            // 1. Lấy ra mã OTP mới nhất của EMAIL này từ Database
+            var otpRecord = await _authRepository.GetLatestOtpByEmailAsync(dto.Email);
 
             // === DEBUG NÀY ĐỂ KIỂM TRA ===
             if (otpRecord == null)
             {
-                Console.WriteLine("[DEBUG] Khong tim thay ma OTP nao trong DB cho so nay!");
+                Console.WriteLine("[DEBUG] Khong tim thay ma OTP nao trong DB cho email nay!");
             }
             else
             {
@@ -70,13 +72,13 @@ namespace RescueHub.Infrastructure.SqlServer.Services
             }
             // ==========================================
 
-            // 3. Kiểm tra xem có OTP không, mã có khớp không và còn hạn không
+            // 2. Kiểm tra xem có OTP không, mã có khớp không và còn hạn không
             if (otpRecord == null || otpRecord.Code != dto.OtpCode || otpRecord.ExpiredAt < DateTime.UtcNow)
             {
                 return "InvalidOtp";
             }
 
-            // 4. Tiến hành tạo User chính thức
+            // 3. Tiến hành tạo User chính thức
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             var newUser = new User
             {
@@ -89,12 +91,12 @@ namespace RescueHub.Infrastructure.SqlServer.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            _context.Users.Add(newUser);
+            await _authRepository.AddUserAsync(newUser);
 
-            // 5. Xóa mã OTP đi vì đã dùng rồi
-            _context.OtpVerifications.Remove(otpRecord);
+            // 4. Xóa mã OTP đi vì đã dùng rồi
+            await _authRepository.RemoveOtpAsync(otpRecord);
 
-            await _context.SaveChangesAsync();
+            await _authRepository.SaveChangesAsync();
             return "Success";
         }
     }

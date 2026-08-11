@@ -4,8 +4,8 @@ namespace RescueHub.Domain.Entities.RegisterDTOs
 {
     public class SendOtpDto
     {
-        [Required(ErrorMessage = "Số điện thoại không được để trống")]
-        [Phone(ErrorMessage = "Định dạng số điện thoại không hợp lệ")]
-        public string PhoneNumber { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Email không được để trống")]
+        [EmailAddress(ErrorMessage = "Định dạng email không hợp lệ")]
+        public string Email { get; set; } = string.Empty;
     }
 }

@@ -19,9 +19,9 @@ namespace RescueHub.Infrastructure.SqlServer.Persistence
         {
             base.OnModelCreating(modelBuilder);
 
-            // Đảm bảo số điện thoại là duy nhất (Unique)
+            // Đảm bảo email là duy nhất (Unique)
             modelBuilder.Entity<User>()
-                .HasIndex(u => u.PhoneNumber)
+                .HasIndex(u => u.Email)
                 .IsUnique();
 
             // Cấu hình thuộc tính Point để ánh xạ chuẩn sang kiểu geography của SQL Server

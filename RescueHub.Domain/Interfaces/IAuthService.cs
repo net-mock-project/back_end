@@ -6,6 +6,7 @@ namespace RescueHub.Domain.Interfaces
     public interface IAuthService
     {
         Task<string> VerifyAndRegisterAsync(RegisterDto dto);
-        Task<bool> SendOtpAsync(string phone); 
+        Task<bool> SendOtpAsync(string email); 
+        Task<bool> ResendOtpAsync(string email);
     }
 }
