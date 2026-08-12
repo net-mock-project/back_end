@@ -43,9 +43,15 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             existing.Gender = user.Gender;
             existing.UpdatedAt = user.UpdatedAt;
 
-            await _dbContext.SaveChangesAsync();
-
-            return true;
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return false;
+            }
         }
 
         // Chuyển Data Model sang Domain Entity

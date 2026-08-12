@@ -51,7 +51,10 @@ namespace RescueHub.API.Controllers
                     $"User '{userId}' not found.");
             }
 
-            return Ok(result);
+            // Map DTO sang Response
+            var response = _mapper.Map<UserProfileResponse>(result);
+
+            return Ok(response);
         }
 
         // Lấy UserId từ token đăng nhập

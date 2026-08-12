@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using RescueHub.API.Models;
+using RescueHub.Application.Contracts;
 using RescueHub.Application.Features.Users.Commands;
 
 
@@ -18,6 +19,9 @@ namespace RescueHub.API.Mappings
                     request.Phone,
                     request.DateOfBirth,
                     request.Gender));
+
+            // DTO -> Response
+            config.NewConfig<UserProfileDto, UserProfileResponse>();
         }
     }
 
