@@ -1,4 +1,8 @@
 ﻿using Mapster;
+using RescueHub.API.Models;
+using RescueHub.Application.Contracts;
+using RescueHub.Application.Features.Users.Commands;
+
 
 namespace RescueHub.API.Mappings
 {
@@ -7,9 +11,18 @@ namespace RescueHub.API.Mappings
     {
         public void Register(TypeAdapterConfig config)
         {
-            // Request -> Command/Query
+            // Request -> Command
+            config.NewConfig<UpdateProfileRequest, UpdateProfileCommand>()
+                .MapWith(request => new UpdateProfileCommand(
+                    Guid.Empty,
+                    request.FullName,
+                    request.Phone,
+                    request.DateOfBirth,
+                    request.Gender));
 
             // DTO -> Response
+            config.NewConfig<UserProfileDto, UserProfileResponse>();
         }
     }
+
 }
