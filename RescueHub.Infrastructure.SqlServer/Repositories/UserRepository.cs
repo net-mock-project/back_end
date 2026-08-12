@@ -5,6 +5,7 @@ using RescueHub.Domain.Interfaces;
 using RescueHub.Infrastructure.SqlServer.Models;
 using RescueHub.Infrastructure.SqlServer.Persistence;
 
+
 namespace RescueHub.Infrastructure.SqlServer.Repositories
 {
     // Repository thao tác dữ liệu User bằng EF Core
@@ -17,20 +18,27 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<User?> GetByIdAsync(Guid userId)
+        public async Task<User?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
         {
             var dataModel = await _dbContext.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Id == userId);
+                .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
-            return MapToDomain(dataModel);
+            return dataModel == null
+                ? null
+                : MapToDomain(dataModel);
         }
 
-        public async Task<bool> UpdateAsync(User user)
+        public async Task<bool> UpdateAsync(User user, CancellationToken cancellationToken)
         {
-            // Lấy bản ghi hiện tại để cập nhật Profile
+            // Khóa row User trong transaction hiện tại
             var existing = await _dbContext.Users
-                .FirstOrDefaultAsync(u => u.Id == user.Id);
+                .FromSqlInterpolated($@"
+                    SELECT *
+                    FROM [User] WITH (UPDLOCK, ROWLOCK)
+                    WHERE Id = {user.Id}")
+                .FirstOrDefaultAsync(cancellationToken);
+
 
             if (existing == null)
             {
@@ -43,15 +51,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             existing.Gender = user.Gender;
             existing.UpdatedAt = user.UpdatedAt;
 
-            try
-            {
-                await _dbContext.SaveChangesAsync();
-                return true;
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return false;
-            }
+            return true;
         }
 
         // Chuyển Data Model sang Domain Entity

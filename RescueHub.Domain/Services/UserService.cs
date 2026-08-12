@@ -19,9 +19,10 @@ namespace RescueHub.Domain.Services
             string? fullName,
             string? phone,
             DateOnly? dateOfBirth,
-            Gender? gender)
+            Gender? gender,
+            CancellationToken cancellationToken)
         { 
-            var user = await _userRepository.GetByIdAsync(userId);
+            var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
 
             if (user == null)
             {
@@ -34,7 +35,7 @@ namespace RescueHub.Domain.Services
                 dateOfBirth,
                 gender);
 
-            var isUpdated = await _userRepository.UpdateAsync(user);
+            var isUpdated = await _userRepository.UpdateAsync(user, cancellationToken);
 
             if (!isUpdated)
                 return null;

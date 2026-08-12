@@ -5,9 +5,9 @@ namespace RescueHub.Domain.Interfaces
     public interface IUserRepository
     {
         // Lấy User theo Id
-        Task<User?> GetByIdAsync(Guid userId);
+        Task<User?> GetByIdAsync(Guid userId, CancellationToken cancellationToken);
 
         // Cập nhật User
-        Task<bool> UpdateAsync(User user);
+        Task<bool> UpdateAsync(User user, CancellationToken cancellationToken);
     }
 }

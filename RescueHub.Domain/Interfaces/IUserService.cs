@@ -12,6 +12,7 @@ namespace RescueHub.Domain.Interfaces
             string? fullName,
             string? phone,
             DateOnly? dateOfBirth,
-            Gender? gender);
+            Gender? gender,
+            CancellationToken cancellationToken);
     }
 }
