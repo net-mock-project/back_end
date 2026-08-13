@@ -22,6 +22,7 @@ namespace RescueHub.API.Mappings
 
             // DTO -> Response
             config.NewConfig<UserProfileDto, UserProfileResponse>();
+            config.NewConfig<UserProfileDto, GetProfileResponse>();
         }
     }
 

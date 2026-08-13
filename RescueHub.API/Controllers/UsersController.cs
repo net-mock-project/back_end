@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using RescueHub.API.Models;
 using RescueHub.Application.Common.Exceptions;
 using RescueHub.Application.Features.Users.Commands;
+using RescueHub.Application.Features.Users.Queries;
 using System.Security.Claims;
 
 namespace RescueHub.API.Controllers
@@ -21,6 +22,36 @@ namespace RescueHub.API.Controllers
         {
             _sender = sender;
             _mapper = mapper;
+        }
+
+        // Lấy thông tin Profile của User hiện tại
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile(
+            CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var query = new GetProfileQuery(
+                userId.Value);
+
+            var result = await _sender.Send(
+                query,
+                cancellationToken);
+
+            if (result == null)
+            {
+                throw new NotFoundException(
+                    $"User '{userId}' not found.");
+            }
+
+            var response = _mapper.Map<GetProfileResponse>(result);
+
+            return Ok(response);
         }
 
         // Cập nhật thông tin Profile của User hiện tại
