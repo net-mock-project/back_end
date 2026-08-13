@@ -1,41 +1,62 @@
 using RescueHub.API;
+using RescueHub.API.Common;
+using RescueHub.API.Extensions;
 using RescueHub.Application;
 using RescueHub.Infrastructure.SqlServer;
 
-using RescueHub.API.Common;
-
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Đăng ký các layer
-builder.Services.AddPresentation();
-builder.Services.AddApplication();
-builder.Services.AddInfrastructureSqlServer(builder.Configuration);
 
+// Presentation / API
 builder.Services.AddControllers();
+builder.Services.AddPresentation();
+
+// Application
+builder.Services.AddApplication();
+
+// Infrastructure
+builder.Services.AddInfrastructure(builder.Configuration);
+
+
+// Cache & CORS
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddCorsPolicy(builder.Configuration);
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// JWT Authentication
+builder.Services.AddJwtAuthentication(builder.Configuration);
+
+// Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+// Build Application
 var app = builder.Build();
 
-// Xử lý exception toàn cục
+
+// Exception Handling
 app.UseExceptionHandler();
 
+
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+
+// HTTP Pipeline
+
 app.UseHttpsRedirection();
 
 app.UseCors("FrontendPolicy");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+

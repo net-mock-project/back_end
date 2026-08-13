@@ -1,4 +1,4 @@
-﻿namespace RescueHub.Application.Interfaces;
+﻿namespace RescueHub.Domain.Interfaces;
 
 public interface IPasswordHasher
 {

@@ -38,6 +38,12 @@ namespace RescueHub.Infrastructure.SqlServer.Configurations
 
             builder.Property(u => u.CreatedAt)
                 .IsRequired();
+
+            // User -> Role
+            builder.HasOne(u => u.Role)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

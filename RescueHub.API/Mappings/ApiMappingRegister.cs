@@ -1,6 +1,8 @@
 ﻿using Mapster;
 using RescueHub.API.Models;
+using RescueHub.API.Models.Authentication;
 using RescueHub.Application.Contracts;
+using RescueHub.Application.Features.Auth.Commands.Login;
 using RescueHub.Application.Features.Users.Commands;
 
 
@@ -19,6 +21,12 @@ namespace RescueHub.API.Mappings
                     request.Phone,
                     request.DateOfBirth,
                     request.Gender));
+
+            config.NewConfig<LoginRequest, LoginCommand>()
+                .MapWith(src => new LoginCommand(
+                    src.Email,
+                    src.Password
+                ));
 
             // DTO -> Response
             config.NewConfig<UserProfileDto, UserProfileResponse>();

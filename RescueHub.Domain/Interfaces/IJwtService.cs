@@ -1,9 +1,9 @@
-﻿namespace RescueHub.Application.Interfaces;
+﻿namespace RescueHub.Domain.Interfaces;
 
 public interface IJwtService
 {
     string GenerateToken(
         Guid userId,
         string email,
-        int roleId);
+        Guid roleId);
 }
