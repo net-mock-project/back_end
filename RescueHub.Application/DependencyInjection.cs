@@ -1,9 +1,10 @@
-﻿using System.Reflection;
-using Mapster;
+﻿using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
+using RescueHub.Application.Services;
 using RescueHub.Domain.Interfaces;
 using RescueHub.Domain.Services;
+using System.Reflection;
 
 namespace RescueHub.Application
 {
@@ -26,6 +27,7 @@ namespace RescueHub.Application
 
             // Đăng ký Domain Service
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }

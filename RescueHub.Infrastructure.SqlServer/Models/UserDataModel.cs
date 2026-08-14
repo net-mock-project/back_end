@@ -38,5 +38,7 @@ namespace RescueHub.Infrastructure.SqlServer.Models
         public DateTime? UpdatedAt { get; set; }
 
         public DateTime? DeleteAt { get; set; }
+
+        public RoleDataModel? Role {  get; set; }
     }
 }

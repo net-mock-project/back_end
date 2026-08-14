@@ -12,12 +12,12 @@ namespace RescueHub.Infrastructure.SqlServer.Configurations
         {
             builder.ToTable("User");
 
+            // Primary Key
             builder.HasKey(u => u.Id);
 
             builder.Property(u => u.RoleId)
                 .IsRequired();
 
-            // Location lưu dưới dạng geography
             builder.Property(u => u.Location)
                 .HasColumnType("geography");
 
@@ -25,6 +25,9 @@ namespace RescueHub.Infrastructure.SqlServer.Configurations
                 .IsRequired();
 
             builder.Property(u => u.Email)
+                .IsRequired();
+
+            builder.Property(u => u.Phone)
                 .IsRequired();
 
             builder.Property(u => u.PasswordHash)
@@ -38,6 +41,21 @@ namespace RescueHub.Infrastructure.SqlServer.Configurations
 
             builder.Property(u => u.CreatedAt)
                 .IsRequired();
+
+            // UNIQUE
+
+            builder.HasIndex(u => u.Email)
+                .IsUnique();
+
+            builder.HasIndex(u => u.Phone)
+                .IsUnique();
+
+            // User -> Role
+
+            builder.HasOne(u => u.Role)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

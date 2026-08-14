@@ -14,6 +14,9 @@ namespace RescueHub.Infrastructure.SqlServer.Persistence
         // DbSet cho bảng User
         public DbSet<UserDataModel> Users => Set<UserDataModel>();
 
+        // DbSet cho bảng Role
+        public DbSet<RoleDataModel> Roles => Set<RoleDataModel>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

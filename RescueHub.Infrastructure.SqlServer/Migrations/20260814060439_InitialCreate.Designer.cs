@@ -13,8 +13,8 @@ using RescueHub.Infrastructure.SqlServer.Persistence;
 namespace RescueHub.Infrastructure.SqlServer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260811043431_InitialUserProfile")]
-    partial class InitialUserProfile
+    [Migration("20260814060439_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,16 +35,22 @@ namespace RescueHub.Infrastructure.SqlServer.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateOnly?>("DateOfBirth")
+                        .HasColumnType("date");
+
                     b.Property<DateTime?>("DeleteAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
@@ -57,7 +63,8 @@ namespace RescueHub.Infrastructure.SqlServer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProfileUrl")
                         .HasColumnType("nvarchar(max)");
@@ -77,7 +84,51 @@ namespace RescueHub.Infrastructure.SqlServer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Phone")
+                        .IsUnique();
+
+                    b.HasIndex("RoleId");
+
                     b.ToTable("User", (string)null);
+                });
+
+            modelBuilder.Entity("RoleDataModel", b =>
+                {
+                    b.Property<Guid>("RoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("RoleId");
+
+                    b.ToTable("Role", (string)null);
+                });
+
+            modelBuilder.Entity("RescueHub.Infrastructure.SqlServer.Models.UserDataModel", b =>
+                {
+                    b.HasOne("RoleDataModel", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("RoleDataModel", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }
