@@ -54,6 +54,32 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             return true;
         }
 
+
+        // Cập nhật URL avatar của User
+        public async Task<bool> UpdateAvatarAsync(
+            User user,
+            CancellationToken cancellationToken)
+        {
+            // Khóa row User trong transaction hiện tại
+            var existing = await _dbContext.Users
+                .FromSqlInterpolated($@"
+                    SELECT *
+                    FROM [User] WITH (UPDLOCK, ROWLOCK)
+                    WHERE Id = {user.Id}")
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (existing == null)
+            {
+                return false;
+            }
+
+            // Cập nhật ảnh đại diện
+            existing.ProfileUrl = user.ProfileUrl;
+            existing.UpdatedAt = user.UpdatedAt;
+
+            return true;
+        }
+
         // Chuyển Data Model sang Domain Entity
         private User? MapToDomain(UserDataModel? dataModel)
         {

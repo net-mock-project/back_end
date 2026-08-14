@@ -18,5 +18,11 @@ namespace RescueHub.Domain.Interfaces
             DateOnly? dateOfBirth,
             Gender? gender,
             CancellationToken cancellationToken);
+
+        // Cập nhật avartar
+        Task<User?> UpdateAvatarAsync(
+            Guid userId,
+            string profileUrl,
+            CancellationToken cancellationToken);
     }
 }

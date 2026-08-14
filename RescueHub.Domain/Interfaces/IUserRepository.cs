@@ -9,5 +9,10 @@ namespace RescueHub.Domain.Interfaces
 
         // Cập nhật User
         Task<bool> UpdateAsync(User user, CancellationToken cancellationToken);
+
+        // Cập nhật URL avatar của User
+        Task<bool> UpdateAvatarAsync(
+            User user,
+            CancellationToken cancellationToken);
     }
 }

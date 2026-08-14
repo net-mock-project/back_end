@@ -1,0 +1,77 @@
+﻿using MediatR;
+using RescueHub.Application.Interfaces;
+using RescueHub.Domain.Interfaces;
+
+namespace RescueHub.Application.Features.Users.Commands;
+
+public record UpdateAvatarCommand(
+    Guid UserId,
+    Stream FileStream,
+    string FileName
+) : IRequest<string?>;
+
+public class UpdateAvatarCommandHandler
+    : IRequestHandler<UpdateAvatarCommand, string?>
+{
+    private readonly IFileStorageService _fileStorageService;
+    private readonly IUserService _userService;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public UpdateAvatarCommandHandler(
+        IFileStorageService fileStorageService,
+        IUserService userService,
+        IUnitOfWork unitOfWork)
+    {
+        _fileStorageService = fileStorageService;
+        _userService = userService;
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<string?> Handle(
+        UpdateAvatarCommand request,
+        CancellationToken cancellationToken)
+    {
+        // Upload ảnh lên Cloudinary và lấy URL
+        var profileUrl = await _fileStorageService.UploadAvatarAsync(
+            request.UserId,
+            request.FileStream,
+            request.FileName,
+            cancellationToken);
+
+        await _unitOfWork.BeginTransactionAsync(
+            cancellationToken);
+
+        try
+        {
+            // Cập nhật đường dẫn avatar của User
+            var user = await _userService.UpdateAvatarAsync(
+                request.UserId,
+                profileUrl,
+                cancellationToken);
+
+            if (user == null)
+            {
+                await _unitOfWork.RollbackAsync(
+                    cancellationToken);
+
+                return null;
+            }
+
+            // Lưu thay đổi xuống database
+            await _unitOfWork.SaveChangesAsync(
+                cancellationToken);
+
+            await _unitOfWork.CommitAsync(
+                cancellationToken);
+
+            return profileUrl;
+        }
+        catch
+        {
+            await _unitOfWork.RollbackAsync(
+                cancellationToken);
+
+            throw;
+        }
+    }
+}
