@@ -1,9 +1,11 @@
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RescueHub.API.Models;
 using RescueHub.API.Models.Authentication;
 using RescueHub.Application.Features.Auth.Commands.Login;
+using RescueHub.Application.Features.Auth.Commands.Register;
+using RescueHub.Application.Features.Auth.Commands.ResendOtp;
+using RescueHub.Application.Features.Auth.Commands.SendOtp;
 namespace RescueHub.API.Controllers;
 
 [ApiController]
@@ -17,7 +19,62 @@ public class AuthController : ControllerBase
         _mediator = mediator;
     }
 
-    // 1. ĐĂNG NHẬP
+    // 1. GỬI MÃ OTP VỀ EMAIL
+    [HttpPost("send-otp")]
+    public async Task<IActionResult> SendOtp(
+        [FromBody] SendOtpRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new SendOtpCommand(
+            request.FullName,
+            request.DateOfBirth,
+            request.Email,
+            request.Phone,
+            request.Gender,
+            request.Password,
+            request.Address);
+
+        var result = await _mediator.Send(
+            command,
+            cancellationToken);
+
+        return Ok(result);
+    }
+
+    // 2. GỬI LẠI MÃ OTP
+    [HttpPost("resend-otp")]
+    public async Task<IActionResult> ResendOtp(
+        [FromBody] ResendOtpRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new ResendOtpCommand(
+            request.Email);
+
+        var result = await _mediator.Send(
+            command,
+            cancellationToken);
+
+        return Ok(result);
+    }
+
+    // 3. XÁC THỰC OTP VÀ ĐĂNG KÝ
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(
+        [FromBody] RegisterRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new RegisterCommand(
+            request.Email,
+            request.OtpCode);
+
+        var result = await _mediator.Send(
+            command,
+            cancellationToken);
+
+        return Ok(result);
+    }
+
+    // 4. ĐĂNG NHẬP
     [HttpPost("login")]
     public async Task<IActionResult> Login(
         [FromBody] LoginRequest request,
@@ -52,7 +109,7 @@ public class AuthController : ControllerBase
                 IsEssential = true
             });
 
-        // Không trả JWT về Client
+        // Trả thông báo về Client
         return Ok(new
         {
             message = "Login successful."
@@ -75,24 +132,6 @@ public class AuthController : ControllerBase
         return Ok(new
         {
             message = "Logout successful."
-        });
-    }
-
-    // 5. KIỂM TRA TOKEN TRONG COOKIE
-    [Authorize]
-    [HttpGet("check-token")]
-    public IActionResult CheckToken()
-    {
-        var userId = User.FindFirst("sub")?.Value;
-        var email = User.FindFirst("email")?.Value;
-        var role = User.FindFirst("role")?.Value;
-
-        return Ok(new
-        {
-            message = "Token hợp lệ.",
-            userId,
-            email,
-            role
         });
     }
 }

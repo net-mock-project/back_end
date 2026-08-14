@@ -5,6 +5,7 @@ using RescueHub.Domain.Interfaces;
 using RescueHub.Infrastructure.SqlServer.Persistence;
 using RescueHub.Infrastructure.SqlServer.Repositories;
 using RescueHub.Infrastructure.SqlServer.Security;
+using RescueHub.Infrastructure.SqlServer.Services;
 
 namespace RescueHub.Infrastructure.SqlServer
 {
@@ -38,6 +39,10 @@ namespace RescueHub.Infrastructure.SqlServer
             // Đăng ký Jwt
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<ICacheService, DistributedCacheService>();
+
+            // Đăng ký Email Service
+            services.AddScoped<IEmailService, EmailService>();
 
             return services;
         }

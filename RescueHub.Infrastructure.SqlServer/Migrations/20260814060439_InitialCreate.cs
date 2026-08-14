@@ -35,8 +35,8 @@ namespace RescueHub.Infrastructure.SqlServer.Migrations
                     Province = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProfileUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateOfBirth = table.Column<DateOnly>(type: "date", nullable: true),
                     Gender = table.Column<int>(type: "int", nullable: true),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -56,6 +56,18 @@ namespace RescueHub.Infrastructure.SqlServer.Migrations
                         principalColumn: "RoleId",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_Email",
+                table: "User",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_Phone",
+                table: "User",
+                column: "Phone",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_RoleId",

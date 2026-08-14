@@ -25,6 +25,19 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             return MapToDomain(dataModel);
         }
 
+        public async Task<User?> GetByPhoneAsync(string phone)
+        {
+            var user = await _dbContext.Users
+                .FirstOrDefaultAsync(u =>
+                    u.Phone == phone &&
+                    u.DeleteAt == null);
+
+            if (user == null)
+                return null;
+
+            return MapToDomain(user);
+        }
+
         public async Task<bool> AddAsync(User user)
         {
             var dataModel = new UserDataModel

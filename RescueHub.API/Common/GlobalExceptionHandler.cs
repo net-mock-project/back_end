@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Microsoft.Data.SqlClient;
 using RescueHub.API.Models;
 using RescueHub.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
@@ -13,30 +14,79 @@ namespace RescueHub.API.Common
     {
         private readonly ILogger<GlobalExceptionHandler> _logger;
 
-        public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+        public GlobalExceptionHandler(
+            ILogger<GlobalExceptionHandler> logger)
         {
             _logger = logger;
         }
 
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+        public async ValueTask<bool> TryHandleAsync(
+            HttpContext httpContext,
+            Exception exception,
+            CancellationToken cancellationToken)
         {
             var (statusCode, messages) = exception switch
             {
-                NotFoundException => (HttpStatusCode.NotFound, new[] { exception.Message }),
-                // Domain ném ArgumentException khi dữ liệu đầu vào không hợp lệ.
-                ArgumentException => (HttpStatusCode.BadRequest, new[] { exception.Message }),
-                _ => (HttpStatusCode.InternalServerError, new[] { "An unexpected error occurred." })
+                NotFoundException =>
+                    (HttpStatusCode.NotFound,
+                    new[] { exception.Message }),
+
+
+                // 400
+                ArgumentException =>
+                    (HttpStatusCode.BadRequest,
+                    new[] { exception.Message }),
+
+                InvalidOperationException =>
+                    (HttpStatusCode.BadRequest,
+                    new[] { exception.Message }),
+
+                // 401
+                UnauthorizedAccessException =>
+                    (HttpStatusCode.Unauthorized,
+                    new[] { exception.Message }),
+
+                // 409
+                SqlException sqlException
+                    when sqlException.Number == 2601 ||
+                         sqlException.Number == 2627
+                    =>
+                    (HttpStatusCode.Conflict,
+                    new[]
+                    {
+                        "Email hoặc số điện thoại đã được sử dụng."
+                    }),
+
+                // 500
+                _ =>
+                    (HttpStatusCode.InternalServerError,
+                    new[]
+                    {
+                        "An unexpected error occurred."
+                    })
             };
 
-            if (statusCode == HttpStatusCode.InternalServerError)
+            // Chỉ log chi tiết cho lỗi ngoài dự kiến; không rò rỉ thông tin ra client.
+            if (statusCode ==
+                HttpStatusCode.InternalServerError)
             {
-                // Chỉ log chi tiết cho lỗi ngoài dự kiến; không rò rỉ thông tin ra client.
-                _logger.LogError(exception, "Unhandled exception while processing {Path}", httpContext.Request.Path);
+                _logger.LogError(
+                    exception,
+                    "Unhandled exception while processing {Path}",
+                    httpContext.Request.Path);
             }
 
-            var response = ApiResponse.Fail(statusCode, messages);
-            httpContext.Response.StatusCode = (int)statusCode;
-            await httpContext.Response.WriteAsJsonAsync(response, cancellationToken);
+            var response =
+                ApiResponse.Fail(
+                    statusCode,
+                    messages);
+
+            httpContext.Response.StatusCode =
+                (int)statusCode;
+
+            await httpContext.Response.WriteAsJsonAsync(
+                response,
+                cancellationToken);
 
             return true;
         }
