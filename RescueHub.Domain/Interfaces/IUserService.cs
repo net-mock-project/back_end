@@ -5,6 +5,10 @@ namespace RescueHub.Domain.Interfaces
 {
     public interface IUserService
     {
+        // Lấy thông tin Profile
+        Task<User?> GetProfileAsync(
+            Guid userId,
+            CancellationToken cancellationToken);
 
         // Cập nhật thông tin Profile
         Task<User?> UpdateProfileAsync(

@@ -13,6 +13,14 @@ namespace RescueHub.Domain.Services
             _userRepository = userRepository;
         }
 
+        public async Task<User?> GetProfileAsync(
+            Guid userId,
+            CancellationToken cancellationToken)
+        {
+            return await _userRepository.GetByIdAsync(
+                userId,
+                cancellationToken);
+        }
 
         public async Task<User?> UpdateProfileAsync(
             Guid userId,
