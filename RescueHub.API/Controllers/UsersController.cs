@@ -88,6 +88,47 @@ namespace RescueHub.API.Controllers
             return Ok(response);
         }
 
+
+        // Cập nhật ảnh đại diện (avatar) của User hiện tại
+        [HttpPatch("profile/avatar")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateAvatar(
+            [FromForm] UpdateAvatarRequest request,
+            CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+
+            // Mở Stream từ file ảnh để truyền xuống Application
+            using var fileStream = request.Avatar.OpenReadStream();
+
+            var command = new UpdateAvatarCommand(
+                userId.Value,
+                fileStream,
+                request.Avatar.FileName);
+
+            var profileUrl = await _sender.Send(
+                command,
+                cancellationToken);
+
+            if (profileUrl == null)
+            {
+                throw new NotFoundException("User not found.");
+            }
+
+            var response = new UpdateAvatarResponse
+            {
+                ProfileUrl = profileUrl
+            };
+
+            return Ok(response);
+        }
+
         // Lấy UserId từ token đăng nhập
         private Guid? GetCurrentUserId()
         {

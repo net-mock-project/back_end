@@ -6,6 +6,9 @@ using RescueHub.Infrastructure.SqlServer.Persistence;
 using RescueHub.Infrastructure.SqlServer.Repositories;
 using RescueHub.Infrastructure.SqlServer.Security;
 using RescueHub.Infrastructure.SqlServer.Services;
+using RescueHub.Infrastructure.SqlServer.Settings;
+using RescueHub.Application.Interfaces;
+
 
 namespace RescueHub.Infrastructure.SqlServer
 {
@@ -19,6 +22,16 @@ namespace RescueHub.Infrastructure.SqlServer
                 configuration.GetConnectionString("DefaultConnection");
             Console.WriteLine(
                 $"[DB] Connection: {connectionString}");
+
+            // Đăng ký kết nối Cloudinary
+            services.Configure<CloudinaryOptions>(
+                configuration.GetSection(
+                    CloudinaryOptions.SectionName));
+
+            // Đăng ký implementation Cloudinary cho dịch vụ lưu trữ file
+            services.AddScoped<
+                IFileStorageService,
+                CloudinaryFileStorageService>();
 
             // Đăng ký DbContext kết nối SQL Server
             services.AddDbContext<ApplicationDbContext>(options =>

@@ -112,5 +112,20 @@ namespace RescueHub.Domain.Entities
             if (isChanged)
                 MarkUpdated();
         }
+
+        // Cập nhật avartar của user
+        public void UpdateAvatar(string profileUrl)
+        {
+            if (string.IsNullOrWhiteSpace(profileUrl))
+                throw new ArgumentException(
+                    "Profile URL cannot be empty.",
+                    nameof(profileUrl));
+
+            if (ProfileUrl == profileUrl)
+                return;
+
+            ProfileUrl = profileUrl;
+            MarkUpdated();
+        }
     }
 }

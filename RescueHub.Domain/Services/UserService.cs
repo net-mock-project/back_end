@@ -50,5 +50,30 @@ namespace RescueHub.Domain.Services
 
             return user;
         }
+
+
+        public async Task<User?> UpdateAvatarAsync(
+            Guid userId,
+            string profileUrl,
+            CancellationToken cancellationToken)
+        {
+            // Lấy user cần cập nhật
+            var user = await _userRepository.GetByIdAsync(
+                userId,
+                cancellationToken);
+
+            if (user == null)
+                return null;
+
+            // Cập nhật URL avatar trong Domain
+            user.UpdateAvatar(profileUrl);
+
+            // Gửi User đã thay đổi xuống Repository
+            var isUpdated = await _userRepository.UpdateAvatarAsync(
+                user,
+                cancellationToken);
+
+            return isUpdated ? user : null;
+        }
     }
 }
