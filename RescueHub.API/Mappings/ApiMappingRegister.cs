@@ -1,11 +1,8 @@
 ﻿using Mapster;
-using RescueHub.API.Models;
-using RescueHub.API.Models.Authentication;
-using RescueHub.Application.Contracts;
-using RescueHub.Application.Features.Auth.Commands.Login;
-using RescueHub.Application.Features.Auth.Commands.Register;
-using RescueHub.Application.Features.Auth.Commands.ResendOtp;
-using RescueHub.Application.Features.Auth.Commands.SendOtp;
+using RescueHub.API.Models.Auth;
+using RescueHub.API.Models.Users;
+using RescueHub.Application.Contracts.Users;
+using RescueHub.Application.Features.Auth.Commands;
 using RescueHub.Application.Features.Users.Commands;
 
 

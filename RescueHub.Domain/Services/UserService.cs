@@ -1,6 +1,6 @@
 ﻿using RescueHub.Domain.Entities;
 using RescueHub.Domain.Enums;
-using RescueHub.Domain.Interfaces;
+using RescueHub.Domain.Interfaces.Users;
 
 namespace RescueHub.Domain.Services
 {

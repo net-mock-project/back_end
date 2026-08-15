@@ -1,8 +1,8 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.Extensions.Options;
-using RescueHub.Application.Interfaces;
-using RescueHub.Infrastructure.SqlServer.Settings;
+using RescueHub.Application.Common.Interfaces;
+using RescueHub.Infrastructure.SqlServer.Configurations;
 
 namespace RescueHub.Infrastructure.SqlServer.Services;
 

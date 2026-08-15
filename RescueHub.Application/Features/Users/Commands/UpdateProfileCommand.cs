@@ -1,8 +1,9 @@
 ﻿using Mapster;
 using MediatR;
-using RescueHub.Application.Contracts;
+using RescueHub.Application.Contracts.Users;
 using RescueHub.Domain.Enums;
 using RescueHub.Domain.Interfaces;
+using RescueHub.Domain.Interfaces.Users;
 
 namespace RescueHub.Application.Features.Users.Commands
 {

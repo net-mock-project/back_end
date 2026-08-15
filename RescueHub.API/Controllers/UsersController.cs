@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RescueHub.API.Models;
+using RescueHub.API.Models.Users;
 using RescueHub.Application.Common.Exceptions;
 using RescueHub.Application.Features.Users.Commands;
 using RescueHub.Application.Features.Users.Queries;

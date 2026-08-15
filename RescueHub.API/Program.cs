@@ -1,6 +1,5 @@
 using RescueHub.API;
 using RescueHub.API.Common;
-using RescueHub.API.Extensions;
 using RescueHub.Application;
 using RescueHub.Infrastructure.SqlServer;
 

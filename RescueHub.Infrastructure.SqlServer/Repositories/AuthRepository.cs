@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using RescueHub.Domain.Common;
 using RescueHub.Domain.Entities;
-using RescueHub.Domain.Interfaces;
+using RescueHub.Domain.Interfaces.Auth;
 using RescueHub.Infrastructure.SqlServer.Models;
 using RescueHub.Infrastructure.SqlServer.Persistence;
 

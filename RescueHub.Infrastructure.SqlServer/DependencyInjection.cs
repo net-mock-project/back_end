@@ -4,10 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using RescueHub.Domain.Interfaces;
 using RescueHub.Infrastructure.SqlServer.Persistence;
 using RescueHub.Infrastructure.SqlServer.Repositories;
-using RescueHub.Infrastructure.SqlServer.Security;
 using RescueHub.Infrastructure.SqlServer.Services;
-using RescueHub.Infrastructure.SqlServer.Settings;
-using RescueHub.Application.Interfaces;
+using RescueHub.Infrastructure.SqlServer.Configurations;
+using RescueHub.Application.Common.Interfaces;
+using RescueHub.Domain.Interfaces.Users;
+using RescueHub.Domain.Interfaces.Auth;
 
 
 namespace RescueHub.Infrastructure.SqlServer

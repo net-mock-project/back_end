@@ -2,44 +2,45 @@
 using Microsoft.Extensions.Caching.Distributed;
 using RescueHub.Domain.Interfaces;
 
-namespace RescueHub.Infrastructure.SqlServer.Services;
-
-public class DistributedCacheService : ICacheService
+namespace RescueHub.Infrastructure.SqlServer.Services
 {
-    private readonly IDistributedCache _cache;
-
-    public DistributedCacheService(IDistributedCache cache)
+    public class DistributedCacheService : ICacheService
     {
-        _cache = cache;
-    }
+        private readonly IDistributedCache _cache;
 
-    public async Task SetAsync<T>(
-        string key,
-        T value,
-        TimeSpan expiration)
-    {
-        var json = JsonSerializer.Serialize(value);
-
-        var options = new DistributedCacheEntryOptions
+        public DistributedCacheService(IDistributedCache cache)
         {
-            AbsoluteExpirationRelativeToNow = expiration
-        };
+            _cache = cache;
+        }
 
-        await _cache.SetStringAsync(key, json, options);
-    }
+        public async Task SetAsync<T>(
+            string key,
+            T value,
+            TimeSpan expiration)
+        {
+            var json = JsonSerializer.Serialize(value);
 
-    public async Task<T?> GetAsync<T>(string key)
-    {
-        var json = await _cache.GetStringAsync(key);
+            var options = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = expiration
+            };
 
-        if (string.IsNullOrEmpty(json))
-            return default;
+            await _cache.SetStringAsync(key, json, options);
+        }
 
-        return JsonSerializer.Deserialize<T>(json);
-    }
+        public async Task<T?> GetAsync<T>(string key)
+        {
+            var json = await _cache.GetStringAsync(key);
 
-    public async Task RemoveAsync(string key)
-    {
-        await _cache.RemoveAsync(key);
+            if (string.IsNullOrEmpty(json))
+                return default;
+
+            return JsonSerializer.Deserialize<T>(json);
+        }
+
+        public async Task RemoveAsync(string key)
+        {
+            await _cache.RemoveAsync(key);
+        }
     }
 }

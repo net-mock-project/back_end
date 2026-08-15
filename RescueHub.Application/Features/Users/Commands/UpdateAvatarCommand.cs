@@ -1,6 +1,7 @@
 ﻿using MediatR;
-using RescueHub.Application.Interfaces;
+using RescueHub.Application.Common.Interfaces;
 using RescueHub.Domain.Interfaces;
+using RescueHub.Domain.Interfaces.Users;
 
 namespace RescueHub.Application.Features.Users.Commands;
 

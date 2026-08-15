@@ -1,11 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using RescueHub.API.Models;
-using RescueHub.API.Models.Authentication;
-using RescueHub.Application.Features.Auth.Commands.Login;
-using RescueHub.Application.Features.Auth.Commands.Register;
-using RescueHub.Application.Features.Auth.Commands.ResendOtp;
-using RescueHub.Application.Features.Auth.Commands.SendOtp;
+using RescueHub.API.Models.Auth;
+using RescueHub.Application.Features.Auth.Commands;
 namespace RescueHub.API.Controllers;
 
 [ApiController]

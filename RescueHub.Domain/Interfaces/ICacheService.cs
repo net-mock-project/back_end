@@ -1,13 +1,14 @@
-﻿namespace RescueHub.Domain.Interfaces;
-
-public interface ICacheService
+﻿namespace RescueHub.Domain.Interfaces
 {
-    Task SetAsync<T>(
-        string key,
-        T value,
-        TimeSpan expiration);
+    public interface ICacheService
+    {
+        Task SetAsync<T>(
+            string key,
+            T value,
+            TimeSpan expiration);
 
-    Task<T?> GetAsync<T>(string key);
+        Task<T?> GetAsync<T>(string key);
 
-    Task RemoveAsync(string key);
+        Task RemoveAsync(string key);
+    }
 }
