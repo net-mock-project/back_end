@@ -9,10 +9,12 @@
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            // Đọc url từ config
             var frontendUrl = configuration["Cors:FrontendUrl"];
 
             services.AddCors(options =>
             {
+                // Set policy chỉ chấp nhận api từ URL
                 options.AddPolicy("FrontendPolicy", policy =>
                 {
                     policy

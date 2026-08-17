@@ -1,5 +1,5 @@
-﻿using RescueHub.Domain.Entities;
-using RescueHub.Domain.Enums;
+﻿using RescueHub.Domain.Common.Enums;
+using RescueHub.Domain.Entities;
 using RescueHub.Domain.Interfaces;
 using RescueHub.Domain.Interfaces.Auth;
 
@@ -167,7 +167,7 @@ namespace RescueHub.Application.Services
                 DateOnly.FromDateTime(pendingData.DateOfBirth),
                 pendingData.Gender,
                 pendingData.PasswordHash,
-                "Active",
+                UserStatus.Active,
                 true,
                 DateTime.UtcNow,
                 null,
@@ -195,7 +195,7 @@ namespace RescueHub.Application.Services
             }
 
             // 2. Kiểm tra tài khoản đã bị xóa
-            if (user.DeleteAt.HasValue)
+            if (user.DeletedAt.HasValue)
             {
                 return (null, null);
             }
@@ -207,10 +207,7 @@ namespace RescueHub.Application.Services
             }
 
             // 4. Kiểm tra trạng thái tài khoản
-            if (!string.Equals(
-                    user.Status,
-                    "Active",
-                    StringComparison.OrdinalIgnoreCase))
+            if (user.Status != UserStatus.Active)
             {
                 return (null, null);
             }

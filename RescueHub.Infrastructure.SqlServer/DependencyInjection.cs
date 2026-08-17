@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RescueHub.Application.Common.Interfaces;
+using RescueHub.Application.Common.Settings;
 using RescueHub.Domain.Interfaces;
+using RescueHub.Domain.Interfaces.Auth;
+using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Infrastructure.SqlServer.Persistence;
 using RescueHub.Infrastructure.SqlServer.Repositories;
+using RescueHub.Infrastructure.SqlServer.Seeds;
 using RescueHub.Infrastructure.SqlServer.Services;
-using RescueHub.Infrastructure.SqlServer.Configurations;
-using RescueHub.Application.Common.Interfaces;
-using RescueHub.Domain.Interfaces.Users;
-using RescueHub.Domain.Interfaces.Auth;
-
 
 namespace RescueHub.Infrastructure.SqlServer
 {
@@ -21,8 +21,6 @@ namespace RescueHub.Infrastructure.SqlServer
         {
             var connectionString =
                 configuration.GetConnectionString("DefaultConnection");
-            Console.WriteLine(
-                $"[DB] Connection: {connectionString}");
 
             // Đăng ký kết nối Cloudinary
             services.Configure<CloudinaryOptions>(
@@ -39,6 +37,8 @@ namespace RescueHub.Infrastructure.SqlServer
                 options.UseSqlServer(
                     connectionString,
                     sqlOptions => sqlOptions.UseNetTopologySuite()));
+
+            services.AddScoped<DatabaseSeeder>();
 
             // Đăng ký Auth Repository
             services.AddScoped<IAuthRepository, AuthRepository>();

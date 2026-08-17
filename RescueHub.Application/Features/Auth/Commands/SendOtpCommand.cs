@@ -1,5 +1,5 @@
 using MediatR;
-using RescueHub.Domain.Enums;
+using RescueHub.Domain.Common.Enums;
 using RescueHub.Domain.Interfaces.Auth;
 
 namespace RescueHub.Application.Features.Auth.Commands

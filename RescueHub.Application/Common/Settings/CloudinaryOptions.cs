@@ -1,4 +1,4 @@
-﻿namespace RescueHub.Infrastructure.SqlServer.Configurations;
+﻿namespace RescueHub.Application.Common.Settings;
 
 public class CloudinaryOptions
 {

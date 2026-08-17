@@ -28,9 +28,10 @@
   <ItemGroup>
 	<Folder Include="Persistence\" />
 	<Folder Include="Repositories\" />
-	<Folder Include="Models\" />
 	<Folder Include="Services\" />
+	<Folder Include="Models\" />
 	<Folder Include="Configurations\" />
+	<Folder Include="Seeds\" />
   </ItemGroup>
 
 </Project>

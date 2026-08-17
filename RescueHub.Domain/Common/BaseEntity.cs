@@ -9,6 +9,8 @@
 
         public DateTime? UpdatedAt { get; protected set; }
 
+        public DateTime? DeletedAt { get; protected set; }
+
 
         // Dùng khi tạo mới Entity
         protected BaseEntity()
@@ -21,11 +23,13 @@
         protected BaseEntity(
             Guid id,
             DateTime createdAt,
-            DateTime? updatedAt)
+            DateTime? updatedAt,
+            DateTime? deletedAt)
         {
             Id = id;
             CreatedAt = createdAt;
             UpdatedAt = updatedAt;
+            DeletedAt = deletedAt;
         }
 
 
@@ -35,5 +39,10 @@
             UpdatedAt = DateTime.Now;
         }
 
+        // Đánh dấu thời điểm Entity bị xóa
+        protected void MarkDeleted()
+        {
+            DeletedAt = DateTime.Now;
+        }
     }
 }

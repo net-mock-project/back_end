@@ -2,6 +2,7 @@ using RescueHub.API;
 using RescueHub.API.Common;
 using RescueHub.Application;
 using RescueHub.Infrastructure.SqlServer;
+using RescueHub.Infrastructure.SqlServer.Seeds;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,13 @@ builder.Services.AddProblemDetails();
 // Build Application
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider
+        .GetRequiredService<DatabaseSeeder>();
+
+    await seeder.SeedAsync();
+}
 
 // Exception Handling
 app.UseExceptionHandler();

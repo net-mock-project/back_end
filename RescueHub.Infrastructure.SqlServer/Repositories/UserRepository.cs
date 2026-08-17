@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RescueHub.Domain.Common;
+using RescueHub.Domain.Common.Enums;
 using RescueHub.Domain.Entities;
 using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Infrastructure.SqlServer.Models;
@@ -113,7 +113,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 dataModel.IsVerified,
                 dataModel.CreatedAt,
                 dataModel.UpdatedAt,
-                dataModel.DeleteAt);
+                dataModel.DeletedAt);
         }
     }
 }

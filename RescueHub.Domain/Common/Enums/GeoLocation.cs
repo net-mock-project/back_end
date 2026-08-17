@@ -1,4 +1,4 @@
-﻿namespace RescueHub.Domain.Common
+﻿namespace RescueHub.Domain.Common.Enums
 {
     public class GeoLocation
     {

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using RescueHub.Domain.Common;
+using RescueHub.Domain.Common.Enums;
 using RescueHub.Domain.Entities;
 using RescueHub.Domain.Interfaces.Auth;
 using RescueHub.Infrastructure.SqlServer.Models;
@@ -30,7 +30,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             var user = await _dbContext.Users
                 .FirstOrDefaultAsync(u =>
                     u.Phone == phone &&
-                    u.DeleteAt == null);
+                    u.DeletedAt == null);
 
             if (user == null)
                 return null;
@@ -56,7 +56,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 IsVerified = user.IsVerified,
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt,
-                DeleteAt = user.DeleteAt
+                DeletedAt = user.DeletedAt
             };
 
             // Nếu User có GeoLocation, map sang kiểu dữ liệu của NetTopologySuite hoặc tương đương trong SqlServer model của bạn
@@ -104,7 +104,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 dataModel.IsVerified,
                 dataModel.CreatedAt,
                 dataModel.UpdatedAt,
-                dataModel.DeleteAt);
+                dataModel.DeletedAt);
         }
     }
 }

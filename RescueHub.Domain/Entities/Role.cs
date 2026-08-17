@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RescueHub.Domain.Entities
+﻿namespace RescueHub.Domain.Entities
 {
     /// <summary>
     /// Vai trò (Role) của người dùng trong hệ thống RescueHub.

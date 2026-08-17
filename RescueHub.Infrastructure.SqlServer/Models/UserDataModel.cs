@@ -1,16 +1,18 @@
 ﻿using NetTopologySuite.Geometries;
-using RescueHub.Domain.Enums;
+using RescueHub.Domain.Common.Enums;
 
 namespace RescueHub.Infrastructure.SqlServer.Models
 {
-    // Data Model ánh xạ tới bảng Users trong SQL Server
     public class UserDataModel
     {
         public Guid Id { get; set; }
 
         public Guid RoleId { get; set; }
 
-        // Location lưu kiểu geography trong SQL Server
+        public Gender? Gender { get; set; }
+
+        public DateOnly? DateOfBirth { get; set; }
+
         public Point? Location { get; set; }
 
         public string? Province { get; set; }
@@ -21,15 +23,11 @@ namespace RescueHub.Infrastructure.SqlServer.Models
 
         public string Email { get; set; } = null!;
 
-        public string? Phone { get; set; }
-
-        public DateOnly? DateOfBirth { get; set; }
-
-        public Gender? Gender { get; set; }
+        public string Phone { get; set; } = null!;
 
         public string PasswordHash { get; set; } = null!;
 
-        public string Status { get; set; } = null!;
+        public UserStatus Status { get; set; }
 
         public bool IsVerified { get; set; }
 
@@ -37,8 +35,28 @@ namespace RescueHub.Infrastructure.SqlServer.Models
 
         public DateTime? UpdatedAt { get; set; }
 
-        public DateTime? DeleteAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
-        public RoleDataModel? Role {  get; set; }
+        public RoleDataModel Role { get; set; } = null!;
+
+        public VolunteerDataModel? Volunteer { get; set; }
+
+        public ICollection<ReliefRequestDataModel> ReliefRequests { get; set; }
+            = new List<ReliefRequestDataModel>();
+
+        public ICollection<ReliefRequestDataModel> CoordinatedReliefRequests { get; set; }
+            = new List<ReliefRequestDataModel>();
+
+        public ICollection<TaskAssignmentDataModel> AssignedTasks { get; set; }
+            = new List<TaskAssignmentDataModel>();
+
+        public ICollection<DonationDataModel> Donations { get; set; }
+            = new List<DonationDataModel>();
+
+        public ICollection<NotificationDataModel> Notifications { get; set; }
+            = new List<NotificationDataModel>();
+
+        public ICollection<AuditLogDataModel> AuditLogs { get; set; }
+            = new List<AuditLogDataModel>();
     }
 }

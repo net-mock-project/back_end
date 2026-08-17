@@ -1,5 +1,5 @@
 ﻿using RescueHub.Domain.Common;
-using RescueHub.Domain.Enums;
+using RescueHub.Domain.Common.Enums;
 
 namespace RescueHub.Domain.Entities
 {
@@ -17,7 +17,7 @@ namespace RescueHub.Domain.Entities
 
         public string Email { get; private set; } = null!;
 
-        public string? Phone { get; private set; }
+        public string Phone { get; private set; } = null!;
 
         public DateOnly? DateOfBirth { get; private set; }
 
@@ -25,15 +25,11 @@ namespace RescueHub.Domain.Entities
 
         public string PasswordHash { get; private set; } = null!;
 
-        public string Status { get; private set; } = null!;
+        public UserStatus Status { get; private set; } = UserStatus.Active;
 
         public bool IsVerified { get; private set; }
 
-        public DateTime? DeleteAt { get; private set; }
-
-
         private User() { }
-
 
         // Dùng khi dựng lại User đã tồn tại từ database
         public User(
@@ -44,16 +40,16 @@ namespace RescueHub.Domain.Entities
             string? profileUrl,
             string fullName,
             string email,
-            string? phone,
+            string phone,
             DateOnly? dateOfBirth,
             Gender? gender,
             string passwordHash,
-            string status,
+            UserStatus status,
             bool isVerified,
             DateTime createdAt,
             DateTime? updatedAt,
-            DateTime? deleteAt)
-            : base(id, createdAt, updatedAt)
+            DateTime? deletedAt)
+            : base(id, createdAt, updatedAt, deletedAt)
         {
             RoleId = roleId;
             Location = location;
@@ -67,9 +63,7 @@ namespace RescueHub.Domain.Entities
             PasswordHash = passwordHash;
             Status = status;
             IsVerified = isVerified;
-            DeleteAt = deleteAt;
         }
-
 
         // Chỉ cập nhật khi dữ liệu thực sự thay đổi
         public void UpdateProfile(

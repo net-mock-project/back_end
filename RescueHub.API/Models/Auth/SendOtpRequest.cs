@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using RescueHub.Domain.Enums;
+using RescueHub.Domain.Common.Enums;
 
 namespace RescueHub.API.Models.Auth
 {
