@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using RescueHub.Domain.Interfaces;
+using RescueHub.Application.Common.Interfaces;
 
 namespace RescueHub.Infrastructure.SqlServer.Services;
 

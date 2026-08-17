@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using RescueHub.Application.Common.Interfaces;
 using RescueHub.Domain.Interfaces;
 using RescueHub.Domain.Interfaces.Users;
@@ -73,6 +74,50 @@ public class UpdateAvatarCommandHandler
                 cancellationToken);
 
             throw;
+        }
+    }
+
+    public class UpdateAvatarCommandValidator
+        : AbstractValidator<UpdateAvatarCommand>
+    {
+        private static readonly string[] AllowedExtensions =
+        {
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp"
+    };
+
+        public UpdateAvatarCommandValidator()
+        {
+            RuleFor(x => x.UserId)
+                .NotEmpty()
+                .WithMessage("User ID is required.");
+
+            RuleFor(x => x.FileStream)
+                .NotNull()
+                .WithMessage("Avatar file is required.");
+
+            RuleFor(x => x.FileStream)
+                .Must(stream => stream != null && stream.Length > 0)
+                .WithMessage("Avatar file cannot be empty.");
+
+            RuleFor(x => x.FileName)
+                .NotEmpty()
+                .WithMessage("File name is required.");
+
+            RuleFor(x => x.FileName)
+                .Must(HaveAllowedExtension)
+                .WithMessage("Avatar must be a JPG, JPEG, PNG, or WEBP image.");
+        }
+
+        private static bool HaveAllowedExtension(string fileName)
+        {
+            var extension = Path.GetExtension(fileName);
+
+            return AllowedExtensions.Contains(
+                extension,
+                StringComparer.OrdinalIgnoreCase);
         }
     }
 }

@@ -3,12 +3,17 @@ using RescueHub.API.Common;
 using RescueHub.Application;
 using RescueHub.Infrastructure.SqlServer;
 using RescueHub.Infrastructure.SqlServer.Seeds;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // Presentation / API
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opts =>
+    {
+        opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 builder.Services.AddPresentation();
 
 // Application

@@ -2,7 +2,6 @@
 
 namespace RescueHub.API.Models.Auth
 {
-    // Dữ liệu Client gửi lên để đăng nhập
     public class LoginRequest
     {
         [Required(

@@ -13,7 +13,7 @@ using RescueHub.Infrastructure.SqlServer.Persistence;
 namespace RescueHub.Infrastructure.SqlServer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260816143128_InitialCreate")]
+    [Migration("20260817075150_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

@@ -35,7 +35,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             var existing = await _dbContext.Users
                 .FromSqlInterpolated($@"
                     SELECT *
-                    FROM [User] WITH (UPDLOCK, ROWLOCK)
+                    FROM [Users] WITH (UPDLOCK, ROWLOCK)
                     WHERE Id = {user.Id}")
                 .FirstOrDefaultAsync(cancellationToken);
 

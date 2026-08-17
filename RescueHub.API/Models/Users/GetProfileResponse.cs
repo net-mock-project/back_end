@@ -2,7 +2,6 @@
 
 namespace RescueHub.API.Models.Users
 {
-    // Dữ liệu Profile trả về Client
     public class GetProfileResponse
     {
         public string FullName { get; set; } = null!;

@@ -1,4 +1,4 @@
-﻿namespace RescueHub.Domain.Interfaces
+﻿namespace RescueHub.Application.Common.Interfaces
 {
     public interface IUnitOfWork
     {

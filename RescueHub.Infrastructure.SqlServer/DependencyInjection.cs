@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RescueHub.Application.Common.Interfaces;
 using RescueHub.Application.Common.Settings;
-using RescueHub.Domain.Interfaces;
 using RescueHub.Domain.Interfaces.Auth;
 using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Infrastructure.SqlServer.Persistence;

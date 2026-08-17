@@ -103,7 +103,6 @@ namespace RescueHub.API.Controllers
                 return Unauthorized();
             }
 
-
             // Mở Stream từ file ảnh để truyền xuống Application
             using var fileStream = request.Avatar.OpenReadStream();
 

@@ -22,32 +22,32 @@ namespace RescueHub.API.Mappings
                     request.Gender));
 
             config.NewConfig<SendOtpRequest, SendOtpCommand>()
-                .MapWith(src => new SendOtpCommand(
-                    src.FullName,
-                    src.DateOfBirth,
-                    src.Email,
-                    src.Phone,
-                    src.Gender,
-                    src.Password,
-                    src.Address
+                .MapWith(request => new SendOtpCommand(
+                    request.FullName,
+                    request.DateOfBirth,
+                    request.Email,
+                    request.Phone,
+                    request.Gender,
+                    request.Password,
+                    request.Address
                 ));
 
             config.NewConfig<ResendOtpRequest, ResendOtpCommand>()
-                .MapWith(src => new ResendOtpCommand(
-                    src.Email
+                .MapWith(request => new ResendOtpCommand(
+                    request.Email
                 ));
 
             config.NewConfig<RegisterRequest, RegisterCommand>()
-                .MapWith(src => new RegisterCommand(
-                    src.Email,
-                    src.OtpCode
+                .MapWith(request => new RegisterCommand(
+                    request.Email,
+                    request.OtpCode
                 ));
 
 
             config.NewConfig<LoginRequest, LoginCommand>()
-                .MapWith(src => new LoginCommand(
-                    src.Email,
-                    src.Password
+                .MapWith(request => new LoginCommand(
+                    request.Email,
+                    request.Password
                 ));
 
             // DTO -> Response

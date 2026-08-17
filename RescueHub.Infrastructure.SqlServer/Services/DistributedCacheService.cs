@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
-using RescueHub.Domain.Interfaces;
+using RescueHub.Application.Common.Interfaces;
 
 namespace RescueHub.Infrastructure.SqlServer.Services
 {

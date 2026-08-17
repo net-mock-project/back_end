@@ -1,4 +1,4 @@
-﻿using RescueHub.Domain.Interfaces;
+﻿using RescueHub.Application.Common.Interfaces;
 
 namespace RescueHub.Infrastructure.SqlServer.Services;
 
