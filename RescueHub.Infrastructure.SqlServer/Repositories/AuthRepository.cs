@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using RescueHub.Domain.Common;
+using RescueHub.Domain.Common.Enums;
 using RescueHub.Domain.Entities;
-using RescueHub.Domain.Interfaces;
+using RescueHub.Domain.Interfaces.Auth;
 using RescueHub.Infrastructure.SqlServer.Models;
 using RescueHub.Infrastructure.SqlServer.Persistence;
 
@@ -16,29 +16,46 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<User?> GetByEmailAsync(string email)
+        public async Task<Guid?> GetRoleIdAsync(string name, CancellationToken cancellationToken)
+        {
+            var role = await _dbContext.Roles
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Name == name);
+
+            if (role == null)
+                return null;
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return role.Id;
+        }
+
+        public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
         {
             var dataModel = await _dbContext.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
 
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
             return MapToDomain(dataModel);
         }
 
-        public async Task<User?> GetByPhoneAsync(string phone)
+        public async Task<User?> GetByPhoneAsync(string phone, CancellationToken cancellationToken)
         {
             var user = await _dbContext.Users
                 .FirstOrDefaultAsync(u =>
                     u.Phone == phone &&
-                    u.DeleteAt == null);
+                    u.DeletedAt == null);
 
             if (user == null)
                 return null;
 
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
             return MapToDomain(user);
         }
 
-        public async Task<bool> AddAsync(User user)
+        public async Task<bool> AddAsync(User user, CancellationToken cancellationToken)
         {
             var dataModel = new UserDataModel
             {
@@ -56,7 +73,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 IsVerified = user.IsVerified,
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt,
-                DeleteAt = user.DeleteAt
+                DeletedAt = user.DeletedAt
             };
 
             // Nếu User có GeoLocation, map sang kiểu dữ liệu của NetTopologySuite hoặc tương đương trong SqlServer model của bạn
@@ -104,7 +121,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 dataModel.IsVerified,
                 dataModel.CreatedAt,
                 dataModel.UpdatedAt,
-                dataModel.DeleteAt);
+                dataModel.DeletedAt);
         }
     }
 }

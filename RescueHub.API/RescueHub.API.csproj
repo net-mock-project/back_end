@@ -8,14 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Mapster" Version="7.4.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.29" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.29" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.29">
+    <Compile Remove="Configurations\**" />
+    <Content Remove="Configurations\**" />
+    <EmbeddedResource Remove="Configurations\**" />
+    <None Remove="Configurations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mapster" Version="10.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.11">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+	<PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Configurations\" />
+	<Folder Include="Common\" />
+	<Folder Include="Controllers\" />
+	<Folder Include="Mappings\" />
   </ItemGroup>
 
 </Project>

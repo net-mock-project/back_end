@@ -1,90 +1,73 @@
+using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using RescueHub.API.Models;
-using RescueHub.API.Models.Authentication;
-using RescueHub.Application.Features.Auth.Commands.Login;
-using RescueHub.Application.Features.Auth.Commands.Register;
-using RescueHub.Application.Features.Auth.Commands.ResendOtp;
-using RescueHub.Application.Features.Auth.Commands.SendOtp;
+using RescueHub.API.Models.Auth;
+using RescueHub.Application.Features.Auth.Commands;
 namespace RescueHub.API.Controllers;
 
 [ApiController]
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly ISender _sender;
+    private readonly IMapper _mapper;
 
-    public AuthController(IMediator mediator)
+    public AuthController(ISender sender, IMapper mapper)
     {
-        _mediator = mediator;
+        _sender = sender;
+        _mapper = mapper;
     }
 
-    // 1. GỬI MÃ OTP VỀ EMAIL
     [HttpPost("send-otp")]
     public async Task<IActionResult> SendOtp(
         [FromBody] SendOtpRequest request,
         CancellationToken cancellationToken)
     {
-        var command = new SendOtpCommand(
-            request.FullName,
-            request.DateOfBirth,
-            request.Email,
-            request.Phone,
-            request.Gender,
-            request.Password,
-            request.Address);
+        var command = _mapper.Map<SendOtpCommand>(request);
 
-        var result = await _mediator.Send(
+        var result = await _sender.Send(
             command,
             cancellationToken);
 
         return Ok(result);
     }
 
-    // 2. GỬI LẠI MÃ OTP
     [HttpPost("resend-otp")]
     public async Task<IActionResult> ResendOtp(
         [FromBody] ResendOtpRequest request,
         CancellationToken cancellationToken)
     {
-        var command = new ResendOtpCommand(
-            request.Email);
+        var command = _mapper.Map<ResendOtpCommand>(request);
 
-        var result = await _mediator.Send(
+        var result = await _sender.Send(
             command,
             cancellationToken);
 
         return Ok(result);
     }
 
-    // 3. XÁC THỰC OTP VÀ ĐĂNG KÝ
     [HttpPost("register")]
-    public async Task<IActionResult> Register(
+        public async Task<IActionResult> Register(
         [FromBody] RegisterRequest request,
         CancellationToken cancellationToken)
     {
-        var command = new RegisterCommand(
-            request.Email,
-            request.OtpCode);
+        var command = _mapper.Map<RegisterCommand>(request);
 
-        var result = await _mediator.Send(
+        var result = await _sender.Send(
             command,
             cancellationToken);
 
         return Ok(result);
     }
 
-    // 4. ĐĂNG NHẬP
     [HttpPost("login")]
-    public async Task<IActionResult> Login(
+        public async Task<IActionResult> Login(
         [FromBody] LoginRequest request,
         CancellationToken cancellationToken)
     {
-        var command = new LoginCommand(
-            request.Email,
-            request.Password);
+        var command = _mapper.Map<LoginCommand>(request);
 
-        var result = await _mediator.Send(
+        var result = await _sender.Send(
             command,
             cancellationToken);
 
@@ -109,14 +92,12 @@ public class AuthController : ControllerBase
                 IsEssential = true
             });
 
-        // Trả thông báo về Client
-        return Ok(new
-        {
-            message = "Login successful."
-        });
+        // Map result sang Response DTO
+        var response = _mapper.Map<LoginResponse>(result);
+
+        return Ok(response);
     }
 
-    // 5. ĐĂNG XUẤT
     [HttpPost("logout")]
     public IActionResult Logout()
     {

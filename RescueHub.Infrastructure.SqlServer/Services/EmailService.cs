@@ -1,10 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using RescueHub.Domain.Interfaces;
-using System;
+using RescueHub.Application.Common.Interfaces;
 using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
 
 namespace RescueHub.Infrastructure.SqlServer.Services
 {

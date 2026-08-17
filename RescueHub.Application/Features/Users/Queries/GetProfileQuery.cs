@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using RescueHub.Application.Contracts;
-using RescueHub.Domain.Interfaces;
 using Mapster;
+using RescueHub.Domain.Interfaces.Users;
+using RescueHub.Application.Contracts.Users;
 
 namespace RescueHub.Application.Features.Users.Queries
 {

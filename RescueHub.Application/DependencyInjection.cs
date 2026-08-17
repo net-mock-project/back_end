@@ -1,8 +1,10 @@
-﻿using Mapster;
+﻿using FluentValidation;
+using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
-using RescueHub.Application.Services;
-using RescueHub.Domain.Interfaces;
+using RescueHub.Application.Common.Behaviors;
+using RescueHub.Domain.Interfaces.Auth;
+using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Domain.Services;
 using System.Reflection;
 
@@ -15,8 +17,13 @@ namespace RescueHub.Application
         {
             // Đăng ký MediatR
             services.AddMediatR(cfg =>
+            {
                 cfg.RegisterServicesFromAssembly(
-                    Assembly.GetExecutingAssembly()));
+                    Assembly.GetExecutingAssembly());
+                cfg.AddOpenBehavior(
+                    typeof(ValidationBehavior<,>));
+            });
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
             // Đăng ký Mapster
             var config = TypeAdapterConfig.GlobalSettings;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RescueHub.Domain.Common;
+using RescueHub.Domain.Common.Enums;
 using RescueHub.Domain.Entities;
-using RescueHub.Domain.Interfaces;
+using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Infrastructure.SqlServer.Models;
 using RescueHub.Infrastructure.SqlServer.Persistence;
 
@@ -35,7 +35,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             var existing = await _dbContext.Users
                 .FromSqlInterpolated($@"
                     SELECT *
-                    FROM [User] WITH (UPDLOCK, ROWLOCK)
+                    FROM [Users] WITH (UPDLOCK, ROWLOCK)
                     WHERE Id = {user.Id}")
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -113,7 +113,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 dataModel.IsVerified,
                 dataModel.CreatedAt,
                 dataModel.UpdatedAt,
-                dataModel.DeleteAt);
+                dataModel.DeletedAt);
         }
     }
 }

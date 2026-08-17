@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using FluentValidation;
 using Microsoft.Data.SqlClient;
 using RescueHub.API.Models;
 using RescueHub.Application.Common.Exceptions;
@@ -27,6 +28,14 @@ namespace RescueHub.API.Common
         {
             var (statusCode, messages) = exception switch
             {
+                ValidationException validationException =>
+                (
+                    HttpStatusCode.BadRequest,
+                    validationException.Errors
+                        .Select(error => error.ErrorMessage)
+                        .ToArray()
+                ),
+
                 NotFoundException =>
                     (HttpStatusCode.NotFound,
                     new[] { exception.Message }),

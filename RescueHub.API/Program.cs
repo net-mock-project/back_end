@@ -1,14 +1,19 @@
 using RescueHub.API;
 using RescueHub.API.Common;
-using RescueHub.API.Extensions;
 using RescueHub.Application;
 using RescueHub.Infrastructure.SqlServer;
+using RescueHub.Infrastructure.SqlServer.Seeds;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // Presentation / API
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opts =>
+    {
+        opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 builder.Services.AddPresentation();
 
 // Application
@@ -35,6 +40,13 @@ builder.Services.AddProblemDetails();
 // Build Application
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider
+        .GetRequiredService<DatabaseSeeder>();
+
+    await seeder.SeedAsync();
+}
 
 // Exception Handling
 app.UseExceptionHandler();
