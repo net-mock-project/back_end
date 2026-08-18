@@ -1,5 +1,6 @@
-﻿using Mapster;
+using Mapster;
 using RescueHub.Application.Contracts.AuditLogs;
+using RescueHub.Application.Contracts.Notifications;
 using RescueHub.Application.Contracts.Querying;
 using RescueHub.Application.Contracts.Users;
 using RescueHub.Domain.Common.Querying;
@@ -18,6 +19,8 @@ namespace RescueHub.Application.Mappings
             // Map Domain Entity sang DTO
             config.NewConfig<User, UserProfileDto>();
             config.NewConfig<AuditLog, AuditLogDto>();
+            config.NewConfig<Notification, NotificationDto>()
+                .Map(dest => dest.Type, src => src.Type.ToString());
         }
     }
 }

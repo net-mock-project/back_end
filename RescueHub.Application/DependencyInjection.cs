@@ -1,10 +1,11 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using RescueHub.Application.Common.Behaviors;
 using RescueHub.Domain.Interfaces.AuditLogs;
 using RescueHub.Domain.Interfaces.Auth;
+using RescueHub.Domain.Interfaces.Notifications;
 using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Domain.Services;
 using System.Reflection;
@@ -37,6 +38,7 @@ namespace RescueHub.Application
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAuditLogService, AuditLogService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             return services;
         }

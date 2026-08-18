@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RescueHub.Application.Common.Interfaces;
 using RescueHub.Application.Common.Settings;
 using RescueHub.Domain.Interfaces.AuditLogs;
 using RescueHub.Domain.Interfaces.Auth;
+using RescueHub.Domain.Interfaces.Notifications;
 using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Infrastructure.SqlServer.Persistence;
 using RescueHub.Infrastructure.SqlServer.Repositories;
@@ -44,6 +45,7 @@ namespace RescueHub.Infrastructure.SqlServer
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
 
             // Đăng ký Unit Of Work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
