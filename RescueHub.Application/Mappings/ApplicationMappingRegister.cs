@@ -5,6 +5,7 @@ using RescueHub.Application.Contracts.Querying;
 using RescueHub.Application.Contracts.Users;
 using RescueHub.Domain.Common.Querying;
 using RescueHub.Domain.Entities;
+using RescueHub.Domain.ReadModels.Users;
 
 namespace RescueHub.Application.Mappings
 {
@@ -18,6 +19,11 @@ namespace RescueHub.Application.Mappings
 
             // Map Domain Entity sang DTO
             config.NewConfig<User, UserProfileDto>();
+            config.NewConfig<UserProfileItem, UserProfileDto>();
+            config.NewConfig<UserListItem, UserListDto>();
+            config.NewConfig<UserDetailItem, UserDetailDto>();
+            config.NewConfig<User, UpdateUserDto>();
+            config.NewConfig<User, UserStatusDto>();
             config.NewConfig<AuditLog, AuditLogDto>();
             config.NewConfig<Notification, NotificationDto>()
                 .Map(dest => dest.Type, src => src.Type.ToString());

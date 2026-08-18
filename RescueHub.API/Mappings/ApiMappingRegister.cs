@@ -9,6 +9,7 @@ using RescueHub.Application.Contracts.Querying;
 using RescueHub.Application.Contracts.Users;
 using RescueHub.Application.Features.Auth.Commands;
 using RescueHub.Application.Features.Users.Commands;
+using RescueHub.Application.Contracts.Querying;
 
 namespace RescueHub.API.Mappings
 {
@@ -25,6 +26,16 @@ namespace RescueHub.API.Mappings
                     request.Phone,
                     request.DateOfBirth,
                     request.Gender));
+
+            config.NewConfig<UpdateUserRequest, UpdateUserCommand>()
+                .MapWith(request => new UpdateUserCommand(
+                    Guid.Empty,
+                    request.FullName,
+                    request.Phone,
+                    request.DateOfBirth,
+                    request.Gender,
+                    Guid.Empty
+                ));
 
             config.NewConfig<SendOtpRequest, SendOtpCommand>()
                 .MapWith(request => new SendOtpCommand(
@@ -55,12 +66,40 @@ namespace RescueHub.API.Mappings
                     request.Password
                 ));
 
+            config.NewConfig<GetUsersRequest, QueryRequest>()
+                .MapWith(request => new QueryRequest
+                {
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize,
+                    Search = request.Search
+                });
+
+            config.NewConfig<CreateUserRequest, CreateUserCommand>()
+                .MapWith(request => new CreateUserCommand(
+                    request.RoleId,
+                    request.Province,
+                    request.FullName,
+                    request.Email,
+                    request.Phone,
+                    request.DateOfBirth,
+                    request.Gender,
+                    request.Password,
+                    Guid.Empty
+                ));
+
             config.NewConfig<AuditLogQueryRequest, QueryRequest>();
             config.NewConfig<NotificationQueryRequest, QueryRequest>();
 
             // DTO -> Response
             config.NewConfig<UserProfileDto, UserProfileResponse>();
             config.NewConfig<UserProfileDto, GetProfileResponse>();
+            config.NewConfig<UserListDto, UserListResponse>();
+            config.NewConfig<
+                PaginationResponse<UserListDto>,
+                PaginationResponse<UserListResponse>>();
+            config.NewConfig<UserDetailDto, UserDetailResponse>();
+            config.NewConfig<CreateUserDto, CreateUserResponse>();
+            config.NewConfig<UserStatusDto, UserStatusResponse>();
             config.NewConfig<AuditLogDto, AuditLogResponse>();
             config.NewConfig<NotificationDto, NotificationResponse>();
         }
