@@ -8,7 +8,7 @@ namespace RescueHub.Infrastructure.SqlServer.Seeds
         private static readonly DateTime SeedDate =
             new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        private const string SeedPasswordHash = "SEED_PASSWORD_HASH";
+        private static readonly string SeedPasswordHash = BCrypt.Net.BCrypt.HashPassword("012345678");
 
         public static List<RoleDataModel> Roles()
         {
