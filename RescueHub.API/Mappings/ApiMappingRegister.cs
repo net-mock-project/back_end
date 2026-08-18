@@ -1,6 +1,9 @@
 ﻿using Mapster;
+using RescueHub.API.Models.AuditLogs;
 using RescueHub.API.Models.Auth;
 using RescueHub.API.Models.Users;
+using RescueHub.Application.Contracts.AuditLogs;
+using RescueHub.Application.Contracts.Querying;
 using RescueHub.Application.Contracts.Users;
 using RescueHub.Application.Features.Auth.Commands;
 using RescueHub.Application.Features.Users.Commands;
@@ -50,9 +53,12 @@ namespace RescueHub.API.Mappings
                     request.Password
                 ));
 
+            config.NewConfig<AuditLogQueryRequest, QueryRequest>();
+
             // DTO -> Response
             config.NewConfig<UserProfileDto, UserProfileResponse>();
             config.NewConfig<UserProfileDto, GetProfileResponse>();
+            config.NewConfig<AuditLogDto, AuditLogResponse>();
         }
     }
 

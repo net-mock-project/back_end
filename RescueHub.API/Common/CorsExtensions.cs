@@ -20,7 +20,8 @@
                     policy
                         .WithOrigins(frontendUrl!)
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
             });
 

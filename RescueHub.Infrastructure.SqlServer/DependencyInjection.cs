@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RescueHub.Application.Common.Interfaces;
 using RescueHub.Application.Common.Settings;
+using RescueHub.Domain.Interfaces.AuditLogs;
 using RescueHub.Domain.Interfaces.Auth;
 using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Infrastructure.SqlServer.Persistence;
@@ -41,10 +42,8 @@ namespace RescueHub.Infrastructure.SqlServer
 
             // Đăng ký Auth Repository
             services.AddScoped<IAuthRepository, AuthRepository>();
-
-
-            // Đăng ký User Repository
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
             // Đăng ký Unit Of Work
             services.AddScoped<IUnitOfWork, UnitOfWork>();

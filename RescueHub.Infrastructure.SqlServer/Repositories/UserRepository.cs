@@ -5,7 +5,6 @@ using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Infrastructure.SqlServer.Models;
 using RescueHub.Infrastructure.SqlServer.Persistence;
 
-
 namespace RescueHub.Infrastructure.SqlServer.Repositories
 {
     // Repository thao tác dữ liệu User bằng EF Core
@@ -64,7 +63,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             var existing = await _dbContext.Users
                 .FromSqlInterpolated($@"
                     SELECT *
-                    FROM [User] WITH (UPDLOCK, ROWLOCK)
+                    FROM [Users] WITH (UPDLOCK, ROWLOCK)
                     WHERE Id = {user.Id}")
                 .FirstOrDefaultAsync(cancellationToken);
 

@@ -10,16 +10,13 @@ public record ResendOtpCommand(string Email) : IRequest<bool>;
 
 public class ResendOtpCommandHandler : IRequestHandler<ResendOtpCommand, bool>
 {
-    private readonly IAuthService _authService;
     private readonly ICacheService _cacheService;
     private readonly IEmailService _emailService;
 
     public ResendOtpCommandHandler(
-        IAuthService authService,
         ICacheService cacheService,
         IEmailService emailService)
     {
-        _authService = authService;
         _cacheService = cacheService;
         _emailService = emailService;
     }

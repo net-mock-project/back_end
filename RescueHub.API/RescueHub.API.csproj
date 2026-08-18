@@ -31,7 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-	<Folder Include="Common\" />
 	<Folder Include="Controllers\" />
 	<Folder Include="Mappings\" />
   </ItemGroup>
