@@ -3,6 +3,7 @@ using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using RescueHub.Application.Common.Behaviors;
+using RescueHub.Domain.Interfaces.AuditLogs;
 using RescueHub.Domain.Interfaces.Auth;
 using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Domain.Services;
@@ -35,6 +36,7 @@ namespace RescueHub.Application
             // Đăng ký Domain Service
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IAuditLogService, AuditLogService>();
 
             return services;
         }
