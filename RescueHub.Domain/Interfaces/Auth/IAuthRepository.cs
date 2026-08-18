@@ -7,6 +7,9 @@ namespace RescueHub.Domain.Interfaces.Auth
         // Lấy roleId
         Task<Guid?> GetRoleIdAsync(string name, CancellationToken cancellationToken);
 
+        // Lấy roleName
+        Task<string?> GetRoleNameAsync(Guid roleId, CancellationToken cancellationToken);
+
         // Kiểm tra xem email đã tồn tại trong hệ thống chưa
         Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken);
 

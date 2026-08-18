@@ -12,7 +12,7 @@ namespace RescueHub.API.Controllers
 {
     [ApiController]
     [Route("api/audit-logs")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class AuditLogsController : ControllerBase
     {
         private readonly ISender _sender;

@@ -1,9 +1,10 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using RescueHub.Application.Common.Interfaces;
+using RescueHub.Domain.Entities;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace RescueHub.Infrastructure.SqlServer.Services;
 
@@ -19,7 +20,8 @@ public class JwtService : IJwtService
     public string GenerateToken(
         Guid userId,
         string email,
-        Guid roleId)
+        Guid roleId,
+        string roleName)
     {
         var key = _configuration["Jwt:Key"]
             ?? throw new InvalidOperationException("JWT key is not configured.");
@@ -40,7 +42,8 @@ public class JwtService : IJwtService
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, email),
-            new Claim(ClaimTypes.Role, roleId.ToString())
+            new Claim("RoleId", roleId.ToString()),
+            new Claim(ClaimTypes.Role, roleName)
         };
 
         var securityKey = new SymmetricSecurityKey(

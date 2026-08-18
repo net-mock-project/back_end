@@ -17,7 +17,7 @@ namespace RescueHub.Domain.Interfaces.Auth
             string passwordHash,
             CancellationToken cancellationToken);
 
-        Task<User?> LoginAsync(
+        Task<(User?, string?)> LoginAsync(
             string email,
             CancellationToken cancellationToken);
     }

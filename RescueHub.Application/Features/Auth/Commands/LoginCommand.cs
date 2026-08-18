@@ -32,11 +32,11 @@ public class LoginCommandHandler
         LoginCommand request,
         CancellationToken cancellationToken)
     {
-        var user = await _authService.LoginAsync(
+        var (user, roleName) = await _authService.LoginAsync(
             request.Email,
             cancellationToken);
 
-        if (user is null) return null;
+        if (user is null || roleName is null) return null;
 
         var isTruePassword = _passwordHasher.Verify(request.Password, user.PasswordHash);
 
@@ -48,11 +48,12 @@ public class LoginCommandHandler
         var token = _jwtService.GenerateToken(
             user.Id,
             user.Email,
-            user.RoleId);
+            user.RoleId,
+            roleName);
 
         if (token is null) return null;
 
-        return new LoginResultDto(token, user.Id, user.Email, user.RoleId);
+        return new LoginResultDto(token, user.Id, user.Email, user.RoleId, roleName);
     }
 
     public class LoginCommandValidator : AbstractValidator<LoginCommand>
