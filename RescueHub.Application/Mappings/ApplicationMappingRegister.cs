@@ -34,26 +34,39 @@ namespace RescueHub.Application.Mappings
                 // 2. Map DonationDate từ Entity sang DTO
                 .Map(dest => dest.DonationDate, src => src.DonationDate)
 
-                // 3. Ép kiểu Enum Status sang string
-                .Map(dest => dest.Status, src => src.Status.ToString())
+                // 3. Map Status
+                .Map(dest => dest.Status, src => src.Status)
 
-                // 4. Lấy tên Supply từ bảng liên quan
-                .Map(dest => dest.SupplyName, src => src.DonationTransactions
-                    .FirstOrDefault() != null ? src.DonationTransactions.FirstOrDefault()!.WarehouseTransactions.WarehouseInventories.Supplys.Name : string.Empty)
-
-                // 5. Lấy Unit từ Supply
-                .Map(dest => dest.Unit, src => src.DonationTransactions
-                    .FirstOrDefault() != null ? src.DonationTransactions.FirstOrDefault()!.WarehouseTransactions.WarehouseInventories.Supplys.Unit : string.Empty)
-
-                // 6. Lấy tên Kho (Warehouse Name)
+                // 4. Lấy tên Kho (Warehouse Name) từ giao dịch đầu tiên
                 .Map(dest => dest.WarehouseName, src => src.DonationTransactions
-                    .FirstOrDefault() != null ? src.DonationTransactions.FirstOrDefault()!.WarehouseTransactions.WarehouseInventories.Warehouses.Name : string.Empty)
+                    .FirstOrDefault() != null
+                    && src.DonationTransactions.FirstOrDefault()!.WarehouseTransactions != null
+                    && src.DonationTransactions.FirstOrDefault()!.WarehouseTransactions!.WarehouseInventories != null
+                    && src.DonationTransactions.FirstOrDefault()!.WarehouseTransactions!.WarehouseInventories!.Warehouses != null
+                        ? src.DonationTransactions.FirstOrDefault()!.WarehouseTransactions!.WarehouseInventories!.Warehouses!.Name
+                        : string.Empty)
 
-                // 7. Lấy Quantity từ Transaction
-                .Map(dest => dest.Quantity, src => src.DonationTransactions
-                    .FirstOrDefault() != null ? src.DonationTransactions.FirstOrDefault()!.WarehouseTransactions.WarehouseInventories.Quantity : 0)
+                // 5. Map danh sách các vật phẩm (Items) từ các transaction liên quan
+                .Map(dest => dest.Items, src => src.DonationTransactions.Select(dt => new DonationItemRequest
+                {
+                    SupplyName = dt.WarehouseTransactions != null
+                                 && dt.WarehouseTransactions.WarehouseInventories != null
+                                 && dt.WarehouseTransactions.WarehouseInventories.Supplys != null
+                        ? dt.WarehouseTransactions.WarehouseInventories.Supplys.Name
+                        : string.Empty,
 
-                // 8. Lấy thông tin Donor
+                    Quantity = dt.WarehouseTransactions != null
+                        ? dt.WarehouseTransactions.Quantity
+                        : 0,
+
+                    Unit = dt.WarehouseTransactions != null
+                           && dt.WarehouseTransactions.WarehouseInventories != null
+                           && dt.WarehouseTransactions.WarehouseInventories.Supplys != null
+                        ? dt.WarehouseTransactions.WarehouseInventories.Supplys.Unit
+                        : string.Empty
+                }).ToList())
+
+                // 6. Lấy thông tin Donor
                 .Map(dest => dest.DonatorName, src => src.Donator != null ? src.Donator.FullName : string.Empty)
                 .Map(dest => dest.DonatorPhone, src => src.Donator != null ? src.Donator.Phone : string.Empty);
         }

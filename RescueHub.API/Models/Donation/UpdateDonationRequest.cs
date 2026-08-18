@@ -1,16 +1,10 @@
-using System.ComponentModel.DataAnnotations;
 
 namespace RescueHub.API.Models.Donation
 {
     public class UpdateDonationRequest 
     {
-        public string? SupplyName { get; set; }
-
-        public int? Quantity { get; set; }
-
-        public string? Unit { get; set; }
+        public List<DonationItemRequest?> Items { get; set; } = new();
 
         public DateTime? DonationDate { get; set; }
-
     }
 }

@@ -10,11 +10,9 @@ namespace RescueHub.Application.Features.Donations.Commands
     public record UpdateDonationCommand(
         Guid UserId,
         Guid DonationId,
-        string? SupplyName,
-        int? Quantity,
-        string? Unit,
+        List<DonationItemRequest?> Items,
         DateTime? DonationDate
-    ) : IRequest<DonationDto?>;
+        ) : IRequest<DonationDto?>;
 
     public class UpdateDonationCommandHandler : IRequestHandler<UpdateDonationCommand, DonationDto?>
     {
@@ -33,12 +31,16 @@ namespace RescueHub.Application.Features.Donations.Commands
 
             try
             {
+                // Chuyển đổi từ List<DonationItemRequest?> sang List<(string SupplyName, int Quantity, string Unit)> (xử lý lọc null)
+                var itemsTuple = request.Items?
+                    .Where(i => i != null)
+                    .Select(i => (i!.SupplyName, i.Quantity, i.Unit))
+                    .ToList();
+
                 var result = await _donationService.UpdateDonationAsync(
                     request.UserId,
                     request.DonationId,
-                    request.SupplyName,
-                    request.Quantity,
-                    request.Unit,
+                    itemsTuple,
                     request.DonationDate,
                     cancellationToken
                 );
@@ -62,7 +64,7 @@ namespace RescueHub.Application.Features.Donations.Commands
         }
     }
 
-    // Validator cho UpdateDonationCommand (chỉ validate các trường khi chúng được truyền lên)
+    // Validator cho UpdateDonationCommand
     public class UpdateDonationCommandValidator : AbstractValidator<UpdateDonationCommand>
     {
         public UpdateDonationCommandValidator()
@@ -74,21 +76,6 @@ namespace RescueHub.Application.Features.Donations.Commands
             RuleFor(x => x.DonationId)
                 .NotEmpty()
                 .WithMessage("Donation ID is required.");
-
-            RuleFor(x => x.SupplyName)
-                .MaximumLength(150)
-                .When(x => !string.IsNullOrWhiteSpace(x.SupplyName))
-                .WithMessage("Supply name must not exceed 150 characters.");
-
-            RuleFor(x => x.Quantity)
-                .GreaterThan(0)
-                .When(x => x.Quantity.HasValue)
-                .WithMessage("Quantity must be greater than 0.");
-
-            RuleFor(x => x.Unit)
-                .MaximumLength(50)
-                .When(x => !string.IsNullOrWhiteSpace(x.Unit))
-                .WithMessage("Unit must not exceed 50 characters.");
         }
     }
 }

@@ -11,7 +11,7 @@ using RescueHub.API.Models.Donation;
 namespace RescueHub.API.Controllers
 {
     [ApiController]
-    [Route("api/coordinator/donations")]
+    [Route("api/coordinator")]
     [Authorize(Roles = "Coordinator")] // Chỉ tài khoản có quyền Coordinator mới gọi được
     public class CoordinatorDonationController : ControllerBase
     {
@@ -24,8 +24,8 @@ namespace RescueHub.API.Controllers
             _mapper = mapper;
         }
 
-        // 1. Xem tất cả các đơn donation đang Pending
-        [HttpGet("all")]
+        
+        [HttpGet("donations")]
         public async Task<IActionResult> GetAllDonations(CancellationToken cancellationToken)
         {
             var coordinatorId = GetCurrentUserId();
@@ -45,7 +45,7 @@ namespace RescueHub.API.Controllers
         }
 
         // 2. Xác nhận đồ đã đến kho (Chuyển Pending -> completed)
-        [HttpPatch("{donationId}/completed")]
+        [HttpPatch("donations/{donationId}/accept")]
         public async Task<IActionResult> ConfirmCompleted(Guid donationId, CancellationToken cancellationToken)
         {
             var coordinatorId = GetCurrentUserId();
@@ -62,7 +62,7 @@ namespace RescueHub.API.Controllers
             return Ok(new { message = "Đã xác nhận nhận đồ thành công, trạng thái chuyển sang Received." });
         }
 
-        [HttpPatch("{donationId}/reject")]
+        [HttpPatch("donations/{donationId}/reject")]
         public async Task<IActionResult> ConfirmRejected(Guid donationId, CancellationToken cancellationToken)
         {
             var coordinatorId = GetCurrentUserId();

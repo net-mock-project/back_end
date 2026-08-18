@@ -64,7 +64,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
         public async Task<Donation?> GetDonationByIdAndUserIdAsync(Guid donationId, Guid userId, CancellationToken cancellationToken)
         {
             return await _context.Set<Donation>()
-                .Include(d => d.Donator) // Lấy thông tin người quyên góp
+                .Include(d => d.Donator)
                 .Include(d => d.DonationTransactions)
                     .ThenInclude(dt => dt.WarehouseTransactions)
                         .ThenInclude(t => t.WarehouseInventories)
@@ -80,7 +80,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
         {
             return await _context.Set<Donation>()
                 .Where(d => d.DonatorId == userId)
-                .Include(d => d.Donator) // Lấy thông tin người quyên góp
+                .Include(d => d.Donator)
                 .Include(d => d.DonationTransactions)
                     .ThenInclude(dt => dt.WarehouseTransactions)
                         .ThenInclude(t => t.WarehouseInventories)
@@ -104,10 +104,22 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 .FirstOrDefaultAsync(t => t.Id == transactionId, cancellationToken);
         }
 
+        public async Task<List<WarehouseTransaction>> GetTransactionsByDonationIdAsync(Guid donationId, CancellationToken cancellationToken)
+        {
+            var transactionIds = await _context.Set<DonationTransaction>()
+                .Where(dt => dt.DonationId == donationId)
+                .Select(dt => dt.TransactionId)
+                .ToListAsync(cancellationToken);
+
+            return await _context.Set<WarehouseTransaction>()
+                .Where(t => transactionIds.Contains(t.Id))
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<Donation?> GetDonationByIdAsync(Guid donationId, CancellationToken cancellationToken)
         {
             return await _context.Set<Donation>()
-                .Include(d => d.Donator) // Lấy thông tin người quyên góp
+                .Include(d => d.Donator)
                 .Include(d => d.DonationTransactions)
                     .ThenInclude(dt => dt.WarehouseTransactions)
                         .ThenInclude(t => t.WarehouseInventories)
@@ -138,7 +150,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
         public async Task<List<Donation>> GetAllDonationsByWarehouseIdAsync(Guid warehouseId, CancellationToken cancellationToken)
         {
             return await _context.Set<Donation>()
-                .Include(d => d.Donator) // Lấy thông tin người quyên góp cho điều phối viên thấy
+                .Include(d => d.Donator)
                 .Include(d => d.DonationTransactions)
                     .ThenInclude(dt => dt.WarehouseTransactions)
                         .ThenInclude(t => t.WarehouseInventories)
@@ -149,17 +161,6 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                             .ThenInclude(wi => wi.Supplys)
                 .Where(d => d.DonationTransactions.Any(dt => dt.WarehouseTransactions.WarehouseInventories.WarehouseId == warehouseId))
                 .ToListAsync(cancellationToken);
-        }
-
-        public async Task<WarehouseTransaction?> GetTransactionByDonationIdAsync(Guid donationId, CancellationToken cancellationToken)
-        {
-            var donationTransaction = await _context.Set<DonationTransaction>()
-                .FirstOrDefaultAsync(dt => dt.DonationId == donationId, cancellationToken);
-
-            if (donationTransaction == null) return null;
-
-            return await _context.Set<WarehouseTransaction>()
-                .FirstOrDefaultAsync(t => t.Id == donationTransaction.TransactionId, cancellationToken);
         }
     }
 }

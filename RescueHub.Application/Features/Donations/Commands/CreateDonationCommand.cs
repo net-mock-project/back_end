@@ -9,11 +9,9 @@ namespace RescueHub.Application.Features.Donations.Commands
 {
     public record CreateDonationCommand(
         Guid DonatorId,
-        string SupplyName,
-        int Quantity,
-        string Unit,
+        List<DonationItemRequest> Items,
         DateTime DonationDate
-    ) : IRequest<DonationDto?>;
+        ) : IRequest<DonationDto?>;
 
     public class CreateDonationCommandHandler : IRequestHandler<CreateDonationCommand, DonationDto?>
     {
@@ -32,11 +30,14 @@ namespace RescueHub.Application.Features.Donations.Commands
 
             try
             {
+                // Chuyển đổi từ List<DonationItemRequest> sang List<(string SupplyName, int Quantity, string Unit)>
+                var itemsTuple = request.Items?
+                    .Select(i => (i.SupplyName, i.Quantity, i.Unit))
+                    .ToList() ?? new List<(string, int, string)>();
+
                 var result = await _donationService.CreateDonationAsync(
                     request.DonatorId,
-                    request.SupplyName,
-                    request.Quantity,
-                    request.Unit,
+                    itemsTuple,
                     request.DonationDate,
                     cancellationToken
                 );
@@ -69,18 +70,9 @@ namespace RescueHub.Application.Features.Donations.Commands
                 .NotEmpty()
                 .WithMessage("Donator ID is required.");
 
-            RuleFor(x => x.SupplyName)
+            RuleFor(x => x.Items)
                 .NotEmpty()
-                .MaximumLength(150)
-                .WithMessage("Supply name is required.");
-
-            RuleFor(x => x.Quantity)
-                .GreaterThan(0)
-                .WithMessage("Quantity must be greater than 0.");
-
-            RuleFor(x => x.Unit)
-                .NotEmpty()
-                .WithMessage("Unit is required.");
+                .WithMessage("Donation items are required.");
 
             RuleFor(x => x.DonationDate)
                 .NotEmpty()

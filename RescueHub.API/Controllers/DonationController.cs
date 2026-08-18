@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace RescueHub.API.Controllers
 {
     [ApiController]
-    [Route("api/donation")]
+    [Route("api/me")]
     [Authorize]
     public class DonationController : ControllerBase
     {
@@ -25,7 +25,7 @@ namespace RescueHub.API.Controllers
         }
 
         // Lấy danh sách Donation của User hiện tại
-        [HttpGet("me")]
+        [HttpGet("donations")]
         public async Task<IActionResult> GetMyDonation(
             CancellationToken cancellationToken)
         {
@@ -51,7 +51,7 @@ namespace RescueHub.API.Controllers
         }
 
         // Tạo donation mới
-        [HttpPost("create")]
+        [HttpPost("donations")]
         public async Task<IActionResult> CreateDonation(
             [FromBody] CreateDonationRequest request,
             CancellationToken cancellationToken)
@@ -79,7 +79,7 @@ namespace RescueHub.API.Controllers
         }
 
         // Cập nhật thông tin của đơn donation
-        [HttpPut("{donationId}")]
+        [HttpPatch("donations/{donationId}")]
         public async Task<IActionResult> UpdateDonation(
             [FromBody] UpdateDonationRequest request,
             Guid donationId,
@@ -113,7 +113,7 @@ namespace RescueHub.API.Controllers
         }
 
         // --- BỔ SUNG: Hủy đơn donation ---
-        [HttpPatch("{donationId}/cancel")]
+        [HttpDelete("donations/{donationId}")]
         public async Task<IActionResult> CancelDonation(
             Guid donationId,
             CancellationToken cancellationToken)

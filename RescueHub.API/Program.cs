@@ -53,11 +53,10 @@ app.UseExceptionHandler();
 
 
 // Swagger
-// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(); // Không cần truyền tham số endpoint thủ công, .NET tự lo
+    app.UseSwaggerUI();
 }
 
 
@@ -74,4 +73,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-

@@ -7,18 +7,16 @@ namespace RescueHub.Domain.Interfaces.Donations
         // User
         Task<Donation> CreateDonationAsync(
             Guid DonatorId,
-            string SupplyName,
-            int Quantity,
-            string Unit,
+            List<(string SupplyName, int Quantity, string Unit)> Items,
             DateTime DonationDate, CancellationToken cancellationToken);
+
         Task<Donation?> UpdateDonationAsync(
             Guid UserId,
-            Guid DonationId,         
-            string? SupplyName,
-            int? Quantity,
-            string? Unit,
+            Guid DonationId,
+            List<(string SupplyName, int Quantity, string Unit)> Items,
             DateTime? DonationDate,
             CancellationToken cancellationToken);
+
         Task<bool> CancelDonationAsync(Guid userId, Guid donationId, CancellationToken cancellationToken);
         Task<List<Donation>> GetDonationsByUserIdAsync(Guid userId, CancellationToken cancellationToken);
 
