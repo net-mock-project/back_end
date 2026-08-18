@@ -53,10 +53,11 @@ app.UseExceptionHandler();
 
 
 // Swagger
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(); // Không cần truyền tham số endpoint thủ công, .NET tự lo
 }
 
 
