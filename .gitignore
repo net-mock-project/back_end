@@ -63,3 +63,13 @@ secrets.json
 ############################
 .DS_Store
 Thumbs.db
+
+############################
+# EF Core Migrations
+############################
+RescueHub.Infrastructure.SqlServer/Migrations/
+
+############################
+RescueHub.API/appsettings.json
+RescueHub.API/appsettings.Development.json
+############################

@@ -5,6 +5,7 @@
         string GenerateToken(
             Guid userId,
             string email,
-            Guid roleId);
+            Guid roleId,
+            string roleName);
     }
 }

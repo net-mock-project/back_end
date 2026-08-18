@@ -63,21 +63,32 @@ namespace RescueHub.Domain.Services
             return true;
         }
 
-        public async Task<User?> LoginAsync(
+        public async Task<(User?, string?)> LoginAsync(
             string email,
             CancellationToken cancellationToken)
         {
             var user = await _authRepository.GetByEmailAsync(email, cancellationToken);
 
-            if (user is null) return null;
+            if (user is null)
+                return (null, null);
 
-            if (user.DeletedAt.HasValue) return null;
+            if (user.DeletedAt.HasValue)
+                return (null, null);
 
-            if (!user.IsVerified) return null;
+            if (!user.IsVerified)
+                return (null, null);
 
-            if (user.Status != UserStatus.Active) return null;
+            if (user.Status != UserStatus.Active)
+                return (null, null);
 
-            return user;
+            var roleName = await _authRepository.GetRoleNameAsync(
+                user.RoleId,
+                cancellationToken);
+
+            if (roleName is null)
+                return (null, null);
+
+            return (user, roleName);
         }
     }
 }

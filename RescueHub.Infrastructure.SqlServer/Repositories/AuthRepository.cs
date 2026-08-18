@@ -29,10 +29,24 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             return role.Id;
         }
 
+        public async Task<string?> GetRoleNameAsync(Guid roleId, CancellationToken cancellationToken)
+        {
+            var role = await _dbContext.Roles
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == roleId);
+
+            if (role == null)
+                return null;
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return role.Name;
+        }
+
         public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)
         {
             var dataModel = await _dbContext.Users
                 .AsNoTracking()
+                .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
 
             await _dbContext.SaveChangesAsync(cancellationToken);
