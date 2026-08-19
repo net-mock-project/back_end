@@ -115,7 +115,10 @@ namespace RescueHub.API.Mappings
                 .MapWith(request => new SubmitVolunteerProfileCommand(
                     Guid.Empty,
                     request.ExperienceYears,
-                    request.CVUrl
+                    request.CVUrl,
+                    request.Skills
+                        .Select(s => new VolunteerSkillInput(s.SkillId, s.Level))
+                        .ToList()
                 ));
 
             config.NewConfig<AuditLogQueryRequest, QueryRequest>();
@@ -133,6 +136,7 @@ namespace RescueHub.API.Mappings
             config.NewConfig<NotificationDto, NotificationResponse>();
             config.NewConfig<DonationDto, GetMyDonationResponse>();
             config.NewConfig<VolunteerProfileDto, VolunteerProfileResponse>();
+            config.NewConfig<VolunteerSkillDto, VolunteerSkillResponse>();
         }
     }
 }

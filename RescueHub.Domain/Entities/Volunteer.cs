@@ -5,23 +5,18 @@ namespace RescueHub.Domain.Entities
 {
     public class Volunteer : BaseEntity
     {
-        public Guid VolunteerId { get; private set; }
-
+        public Guid VolunteerId => Id;
         public int ExperienceYears { get; private set; }
-
         public VolunteerApprovalStatus ApprovalStatus { get; private set; }
-
         public string? CVUrl { get; private set; }
-
         public Guid? ApprovedBy { get; private set; }
-
         public DateTime? ApprovedAt { get; private set; }
 
-        private Volunteer() { }
+        private readonly List<VolunteerSkill> _skills = new();
+        public IReadOnlyCollection<VolunteerSkill> Skills => _skills.AsReadOnly();
 
-        // Dùng khi dựng lại Volunteer đã tồn tại từ database
         public Volunteer(
-            Guid volunteerId,
+            Guid id,
             int experienceYears,
             VolunteerApprovalStatus approvalStatus,
             string? cvUrl,
@@ -29,15 +24,20 @@ namespace RescueHub.Domain.Entities
             DateTime? approvedAt,
             DateTime createdAt,
             DateTime? updatedAt,
-            DateTime? deletedAt)
-            : base(volunteerId, createdAt, updatedAt, deletedAt)
+            DateTime? deletedAt,
+            IEnumerable<VolunteerSkill>? skills = null)
+            : base(id, createdAt, updatedAt, deletedAt)
         {
-            VolunteerId = volunteerId;
             ExperienceYears = experienceYears;
             ApprovalStatus = approvalStatus;
             CVUrl = cvUrl;
             ApprovedBy = approvedBy;
             ApprovedAt = approvedAt;
+
+            if (skills != null)
+            {
+                _skills.AddRange(skills);
+            }
         }
     }
 }

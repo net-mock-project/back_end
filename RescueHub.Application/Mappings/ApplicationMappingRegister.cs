@@ -3,6 +3,7 @@ using RescueHub.Application.Contracts.AuditLogs;
 using RescueHub.Application.Contracts.Notifications;
 using RescueHub.Application.Contracts.Querying;
 using RescueHub.Application.Contracts.Users;
+using RescueHub.Application.Contracts.Volunteers;
 using RescueHub.Domain.Common.Querying;
 using RescueHub.Domain.Entities;
 using RescueHub.Application.Contracts.Donation;
@@ -26,6 +27,12 @@ namespace RescueHub.Application.Mappings
 
             config.NewConfig<Notification, NotificationDto>()
                 .Map(dest => dest.Type, src => src.Type.ToString());
+
+            config.NewConfig<Volunteer, VolunteerProfileDto>()
+                .Map(dest => dest.Id, src => src.VolunteerId)
+                .Map(dest => dest.Skills, src => src.Skills);
+            config.NewConfig<VolunteerSkill, VolunteerSkillDto>();
+
 
             config.NewConfig<Donation, DonationDto>()
                 // 1. Map Id sang DonationId

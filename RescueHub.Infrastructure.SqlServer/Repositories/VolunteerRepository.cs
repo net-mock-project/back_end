@@ -21,13 +21,11 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
         {
             var dataModel = await _dbContext.Volunteers
                 .AsNoTracking()
-                .FirstOrDefaultAsync(
-                    v => v.Id == volunteerId,
-                    cancellationToken);
+                .Include(v => v.VolunteerSkills)
+                    .ThenInclude(vs => vs.Skill)
+                .FirstOrDefaultAsync(v => v.Id == volunteerId, cancellationToken);
 
-            return dataModel == null
-                ? null
-                : MapToDomain(dataModel);
+            return dataModel == null ? null : MapToDomain(dataModel);
         }
 
         public async Task AddAsync(
@@ -44,12 +42,16 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 ApprovedAt = volunteer.ApprovedAt,
                 CreatedAt = volunteer.CreatedAt,
                 UpdatedAt = volunteer.UpdatedAt,
-                DeletedAt = volunteer.DeletedAt
+                DeletedAt = volunteer.DeletedAt,
+                VolunteerSkills = volunteer.Skills.Select(s => new VolunteerSkillDataModel
+                {
+                    VolunteerId = volunteer.VolunteerId,
+                    SkillId = s.SkillId,
+                    Level = s.Level
+                }).ToList()
             };
 
-            await _dbContext.Volunteers.AddAsync(
-                dataModel,
-                cancellationToken);
+            await _dbContext.Volunteers.AddAsync(dataModel, cancellationToken);
         }
 
         public async Task UpdateAsync(
@@ -71,12 +73,18 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             }
         }
 
-        // Chuyển Data Model sang Domain Entity
-        private Volunteer? MapToDomain(
-            VolunteerDataModel? dataModel)
+        private Volunteer? MapToDomain(VolunteerDataModel? dataModel)
         {
             if (dataModel == null)
                 return null;
+
+            var skills = dataModel.VolunteerSkills?.Select(vs =>
+                new VolunteerSkill(
+                    vs.VolunteerId,
+                    vs.SkillId,
+                    vs.Level,
+                    vs.Skill?.Name)
+            ).ToList();
 
             return new Volunteer(
                 dataModel.Id,
@@ -87,7 +95,8 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 dataModel.ApprovedAt,
                 dataModel.CreatedAt,
                 dataModel.UpdatedAt,
-                dataModel.DeletedAt);
+                dataModel.DeletedAt,
+                skills);
         }
     }
 }

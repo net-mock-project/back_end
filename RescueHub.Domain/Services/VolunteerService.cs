@@ -30,11 +30,16 @@ namespace RescueHub.Domain.Services
             Guid volunteerId,
             int experienceYears,
             string? cvUrl,
+            IEnumerable<(Guid SkillId, int Level)> skills,
             CancellationToken cancellationToken)
         {
             var existingVolunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
             if (existingVolunteer != null)
                 return null;
+
+            var volunteerSkills = skills.Select(s =>
+                new VolunteerSkill(volunteerId, s.SkillId, s.Level)
+            ).ToList();
 
             var volunteer = new Volunteer(
                 volunteerId,
@@ -45,7 +50,8 @@ namespace RescueHub.Domain.Services
                 null,
                 DateTime.UtcNow,
                 null,
-                null);
+                null,
+                volunteerSkills);
 
             await _volunteerRepository.AddAsync(volunteer, cancellationToken);
             return volunteer;
@@ -64,7 +70,6 @@ namespace RescueHub.Domain.Services
             if (user == null)
                 return null;
 
-            // 1. Cập nhật trạng thái duyệt hồ sơ Volunteer
             var updatedVolunteer = new Volunteer(
                 volunteer.VolunteerId,
                 volunteer.ExperienceYears,
@@ -74,13 +79,13 @@ namespace RescueHub.Domain.Services
                 DateTime.UtcNow,
                 volunteer.CreatedAt,
                 DateTime.UtcNow,
-                null);
+                null,
+                volunteer.Skills);
 
             await _volunteerRepository.UpdateAsync(updatedVolunteer, cancellationToken);
 
-            // 2. Chuyển RoleId của User sang Volunteer
             user.ChangeRole(RoleConstants.VolunteerId);
-            await _userRepository.UpdateAsync(user, cancellationToken);
+            await _userRepository.UpdateRoleAsync(user, cancellationToken);
 
             return updatedVolunteer;
         }
@@ -103,7 +108,8 @@ namespace RescueHub.Domain.Services
                 DateTime.UtcNow,
                 volunteer.CreatedAt,
                 DateTime.UtcNow,
-                null);
+                null,
+                volunteer.Skills);
 
             await _volunteerRepository.UpdateAsync(updatedVolunteer, cancellationToken);
             return updatedVolunteer;

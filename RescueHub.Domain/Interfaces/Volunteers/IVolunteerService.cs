@@ -14,6 +14,7 @@ namespace RescueHub.Domain.Interfaces.Volunteers
             Guid volunteerId,
             int experienceYears,
             string? cvUrl,
+            IEnumerable<(Guid SkillId, int Level)> skills,
             CancellationToken cancellationToken);
 
         Task<Volunteer?> ApproveProfileAsync(
