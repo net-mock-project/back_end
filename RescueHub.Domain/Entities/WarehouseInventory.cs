@@ -6,7 +6,7 @@ namespace RescueHub.Domain.Entities
     {
         public Guid WarehouseId { get; set; }
         public Guid SupplyId { get; set; }
-        public int Quantity { get; set; }      
+        public int Quantity { get; set; }
 
         public Warehouse Warehouses { get; set; } = null!;
         public Supply Supplys { get; set; } = null!;
@@ -32,7 +32,13 @@ namespace RescueHub.Domain.Entities
         public void UpdateQuantity(int newQuantity)
         {
             Quantity = newQuantity;
-            MarkUpdated();
+            MarkUpdated(); 
+        }
+
+        public void AddQuantity(int quantity)
+        {
+            Quantity += quantity;
+            MarkUpdated(); 
         }
     }
 }

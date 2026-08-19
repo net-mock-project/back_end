@@ -45,7 +45,7 @@ namespace RescueHub.API.Controllers
         }
 
         // 2. Xác nhận đồ đã đến kho (Chuyển Pending -> completed)
-        [HttpPatch("donations/{donationId}/accept")]
+        [HttpPatch("donations/{donationId:guid}/accept")]
         public async Task<IActionResult> ConfirmCompleted(Guid donationId, CancellationToken cancellationToken)
         {
             var coordinatorId = GetCurrentUserId();
@@ -62,7 +62,7 @@ namespace RescueHub.API.Controllers
             return Ok(new { message = "Đã xác nhận nhận đồ thành công, trạng thái chuyển sang Received." });
         }
 
-        [HttpPatch("donations/{donationId}/reject")]
+        [HttpPatch("donations/{donationId:guid}/reject")]
         public async Task<IActionResult> ConfirmRejected(Guid donationId, CancellationToken cancellationToken)
         {
             var coordinatorId = GetCurrentUserId();

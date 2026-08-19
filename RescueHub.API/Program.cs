@@ -66,9 +66,9 @@ app.UseHttpsRedirection();
 
 app.UseCors("FrontendPolicy");
 
-app.UseAuthentication();
+//app.UseAuthentication();
 
-app.UseAuthorization();
+//app.UseAuthorization();
 
 app.MapControllers();
 

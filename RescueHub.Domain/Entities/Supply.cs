@@ -2,7 +2,7 @@ using RescueHub.Domain.Common;
 
 namespace RescueHub.Domain.Entities
 {
-    public class Supply : BaseEntity
+    public class Supply: BaseEntity
     {
         public string Name { get; set; } = null!;
         public string? Category { get; set; }

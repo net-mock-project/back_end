@@ -47,9 +47,32 @@ namespace RescueHub.Domain.Entities
             MarkUpdated();
         }
 
-        public void UpdateDonation()
+        public void Cancel()
         {
-            MarkUpdated();
+            Status = DonationStatus.Cancelled;
+            MarkUpdated(); 
+        }
+
+        public void Complete(Guid coordinatorId)
+        {
+            Status = DonationStatus.Completed;
+            ApprovedBy = coordinatorId;
+            ApprovedAt = DateTime.UtcNow;
+            MarkUpdated(); 
+        }
+
+        public void Reject(Guid coordinatorId)
+        {
+            Status = DonationStatus.Rejected;
+            ApprovedBy = coordinatorId;
+            ApprovedAt = DateTime.UtcNow;
+            MarkUpdated(); 
+        }
+
+        public void UpdateDate(DateTime donationDate)
+        {
+            DonationDate = donationDate;
+            MarkUpdated(); 
         }
     }
 }

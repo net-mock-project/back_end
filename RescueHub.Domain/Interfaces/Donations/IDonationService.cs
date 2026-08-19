@@ -13,7 +13,7 @@ namespace RescueHub.Domain.Interfaces.Donations
         Task<Donation?> UpdateDonationAsync(
             Guid UserId,
             Guid DonationId,
-            List<(string SupplyName, int Quantity, string Unit)> Items,
+            List<(string SupplyName, int Quantity, string Unit)>? Items,
             DateTime? DonationDate,
             CancellationToken cancellationToken);
 

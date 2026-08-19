@@ -14,24 +14,22 @@ namespace RescueHub.Domain.Services
         }
 
         public async Task<Donation> CreateDonationAsync(
-            Guid DonatorId,
-            List<(string SupplyName, int Quantity, string Unit)> Items,
-            DateTime DonationDate,
+            Guid donatorId,
+            List<(string SupplyName, int Quantity, string Unit)> items,
+            DateTime donationDate,
             CancellationToken cancellationToken)
         {
-            if (Items == null || !Items.Any())
+            if (items == null || !items.Any())
             {
                 throw new Exception("At least one donation item is required.");
             }
 
-            // 1. Lấy thông tin User để lấy tọa độ
-            var user = await _donationRepository.GetUserByIdAsync(DonatorId, cancellationToken);
+            var user = await _donationRepository.GetUserByIdAsync(donatorId, cancellationToken);
             if (user == null || user.Location == null)
             {
-                throw new Exception($"User '{DonatorId}' not found or location is not set.");
+                throw new Exception($"User '{donatorId}' not found or location is not set.");
             }
 
-            // 2. Lấy danh sách kho và tìm kho gần nhất
             var warehouses = await _donationRepository.GetAllWarehousesAsync(cancellationToken);
             if (warehouses == null || !warehouses.Any())
             {
@@ -61,25 +59,23 @@ namespace RescueHub.Domain.Services
                 throw new Exception("No warehouse with valid location found nearby.");
             }
 
-            // 3. Tạo Donation chính
             var donationId = Guid.NewGuid();
             var donation = new Donation(
                 id: donationId,
-                donatorId: DonatorId,
+                donatorId: donatorId,
                 status: DonationStatus.Pending,
-                donationDate: DonationDate,
+                donationDate: donationDate,
                 approvedBy: null,
                 approvedAt: null,
                 remark: null,
                 createdAt: DateTime.UtcNow,
-                updatedAt: null
+                updatedAt: null,
+                deletedAt: null
             );
             await _donationRepository.AddDonationAsync(donation, cancellationToken);
 
-            // 4. Duyệt qua từng item để tạo Supply, Inventory, Transaction và Link
-            foreach (var item in Items)
+            foreach (var item in items)
             {
-                // Tìm hoặc tạo Supply
                 var supply = await _donationRepository.GetSupplyByNameAsync(item.SupplyName, cancellationToken);
                 Guid supplyId;
                 if (supply != null)
@@ -102,7 +98,6 @@ namespace RescueHub.Domain.Services
                     await _donationRepository.AddSupplyAsync(supply, cancellationToken);
                 }
 
-                // Kiểm tra hoặc tạo WarehouseInventory trong kho gần nhất
                 var warehouseInventory = await _donationRepository.GetWarehouseInventoryAsync(nearestWarehouse.Id, supplyId, cancellationToken);
                 Guid warehouseInventoryId;
                 if (warehouseInventory == null)
@@ -124,7 +119,6 @@ namespace RescueHub.Domain.Services
                     warehouseInventoryId = warehouseInventory.Id;
                 }
 
-                // Tạo WarehouseTransaction
                 var transactionId = Guid.NewGuid();
                 var transaction = new WarehouseTransaction
                 {
@@ -133,13 +127,13 @@ namespace RescueHub.Domain.Services
                     Quantity = item.Quantity,
                     TransactionType = WarehouseTransactionType.Import,
                     Status = WarehouseTransactionStatus.Pending,
-                    CreatedBy = DonatorId,
+                    CreatedBy = donatorId,
                     CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = null
+                    UpdatedAt = null,
+                    DeletedAt = null
                 };
                 await _donationRepository.AddTransactionAsync(transaction, cancellationToken);
 
-                // Tạo bảng trung gian DonationTransaction
                 var donationTransaction = new DonationTransaction(donationId, transactionId);
                 await _donationRepository.AddDonationTransactionAsync(donationTransaction, cancellationToken);
             }
@@ -150,50 +144,41 @@ namespace RescueHub.Domain.Services
         public async Task<Donation?> UpdateDonationAsync(
             Guid userId,
             Guid donationId,
-            List<(string SupplyName, int Quantity, string Unit)> Items,
+            List<(string SupplyName, int Quantity, string Unit)>? items,
             DateTime? donationDate,
             CancellationToken cancellationToken)
         {
-            // 1. Lấy đơn quyên góp kèm theo các giao dịch và thông tin kho/vật phẩm cũ
-            var donation = await _donationRepository.GetDonationByIdAndUserIdAsync(donationId, userId, cancellationToken);
-            if (donation == null) return null;
+            var donation = await _donationRepository.GetDonationWithTrackingAsync(donationId, cancellationToken);
+            if (donation == null || donation.DonatorId != userId) return null;
 
-            // 2. Kiểm tra trạng thái
             if (donation.Status != DonationStatus.Pending)
             {
                 throw new InvalidOperationException("Chỉ có thể chỉnh sửa đơn quyên góp khi đang ở trạng thái chờ xử lý (Pending).");
             }
 
-            // 3. Cập nhật ngày quyên góp nếu có
             if (donationDate.HasValue)
             {
-                donation.DonationDate = donationDate.Value;
+                donation.UpdateDate(donationDate.Value); // Dùng phương thức Domain
             }
 
-            // 4. Nếu có truyền danh sách Items mới, tiến hành đồng bộ
-            if (Items != null && Items.Any())
+            if (items != null && items.Any())
             {
-                // Lấy kho hiện tại của đơn (dựa vào giao dịch cũ đầu tiên để biết đơn này đang gắn với kho nào)
-                var firstTransaction = donation.DonationTransactions.FirstOrDefault()?.WarehouseTransactions;
-                if (firstTransaction?.WarehouseInventories == null)
+                var firstDt = donation.DonationTransactions.FirstOrDefault();
+                if (firstDt?.WarehouseTransactions?.WarehouseInventories == null)
                 {
                     throw new Exception("Không tìm thấy thông tin kho liên kết với đơn quyên góp này.");
                 }
-                Guid warehouseId = firstTransaction.WarehouseInventories.WarehouseId;
 
-                // Xóa các transaction và liên kết cũ đi để tạo lại danh sách m
-                // Lấy danh sách transaction cũ để xử lý xóa/thay thế
+                Guid warehouseId = firstDt.WarehouseTransactions.WarehouseInventories.WarehouseId;
+
                 foreach (var dt in donation.DonationTransactions.ToList())
                 {
-                    
-                    // clear danh sách DonationTransactions
+                    _donationRepository.RemoveDonationTransaction(dt);
                     donation.DonationTransactions.Remove(dt);
                 }
 
-                // Tạo lại các Transaction mới tương ứng với danh sách Items mới
-                foreach (var item in Items)
+                foreach (var item in items)
                 {
-                    // 4.1. Tìm hoặc tạo Supply mới nếu chưa có
                     var supply = await _donationRepository.GetSupplyByNameAsync(item.SupplyName, cancellationToken);
                     Guid supplyId;
                     if (supply != null)
@@ -216,13 +201,12 @@ namespace RescueHub.Domain.Services
                         await _donationRepository.AddSupplyAsync(supply, cancellationToken);
                     }
 
-                    // 4.2. Kiểm tra hoặc tạo WarehouseInventory trong kho tương ứng
                     var warehouseInventory = await _donationRepository.GetWarehouseInventoryAsync(warehouseId, supplyId, cancellationToken);
                     Guid warehouseInventoryId;
                     if (warehouseInventory == null)
                     {
                         warehouseInventoryId = Guid.NewGuid();
-                        warehouseInventory = new WarehouseInventory(
+                        var newInventoryDomain = new WarehouseInventory(
                             id: warehouseInventoryId,
                             warehouseId: warehouseId,
                             supplyId: supplyId,
@@ -231,14 +215,13 @@ namespace RescueHub.Domain.Services
                             updatedAt: null,
                             deletedAt: null
                         );
-                        await _donationRepository.AddWarehouseInventoryAsync(warehouseInventory, cancellationToken);
+                        await _donationRepository.AddWarehouseInventoryAsync(newInventoryDomain, cancellationToken);
                     }
                     else
                     {
                         warehouseInventoryId = warehouseInventory.Id;
                     }
 
-                    // 4.3. Tạo WarehouseTransaction mới
                     var transactionId = Guid.NewGuid();
                     var newTransaction = new WarehouseTransaction
                     {
@@ -249,36 +232,33 @@ namespace RescueHub.Domain.Services
                         Status = WarehouseTransactionStatus.Pending,
                         CreatedBy = userId,
                         CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = null
+                        UpdatedAt = null,
+                        DeletedAt = null
                     };
                     await _donationRepository.AddTransactionAsync(newTransaction, cancellationToken);
 
-                    // 4.4. Tạo liên kết DonationTransaction mới
                     var donationTransaction = new DonationTransaction(donation.Id, transactionId);
                     await _donationRepository.AddDonationTransactionAsync(donationTransaction, cancellationToken);
-
-                    // Thêm vào navigation property để trả về kết quả ngay nếu cần
-                    donation.DonationTransactions.Add(donationTransaction);
                 }
             }
 
-            // 5. Đánh dấu donation đã được cập nhật thời gian
-            donation.UpdateDonation();
+            _donationRepository.UpdateDonation(donation);
 
-            return donation;
+            return await _donationRepository.GetDonationByIdAndUserIdAsync(donationId, userId, cancellationToken);
         }
 
         public async Task<bool> CancelDonationAsync(Guid userId, Guid donationId, CancellationToken cancellationToken)
         {
-            var donation = await _donationRepository.GetDonationByIdAndUserIdAsync(donationId, userId, cancellationToken);
-            if (donation == null) return false;
+            var donation = await _donationRepository.GetDonationWithTrackingAsync(donationId, cancellationToken);
+            if (donation == null || donation.DonatorId != userId) return false;
 
             if (donation.Status != DonationStatus.Pending)
             {
                 throw new InvalidOperationException("Không thể hủy đơn quyên góp đã được duyệt hoặc đã hoàn thành.");
             }
 
-            donation.UpdateStatus(DonationStatus.Cancelled, userId);
+            donation.Cancel(); // Gọi phương thức domain
+            _donationRepository.UpdateDonation(donation);
             return true;
         }
 
@@ -289,27 +269,27 @@ namespace RescueHub.Domain.Services
 
         public async Task<bool> ConfirmDonationReceivedAsync(Guid donationId, Guid coordinatorId, CancellationToken cancellationToken)
         {
-            var donationEntity = await _donationRepository.GetDonationByIdAsync(donationId, cancellationToken);
-            if (donationEntity == null) return false;
+            var donation = await _donationRepository.GetDonationWithTrackingAsync(donationId, cancellationToken);
+            if (donation == null) return false;
 
-            if (donationEntity.Status != DonationStatus.Pending)
+            if (donation.Status != DonationStatus.Pending)
             {
                 throw new InvalidOperationException("Chỉ có thể xác nhận nhận đồ cho các đơn đang ở trạng thái Pending.");
             }
 
-            donationEntity.UpdateStatus(DonationStatus.Completed, coordinatorId);
+            donation.Complete(coordinatorId); // Gọi phương thức domain
+            _donationRepository.UpdateDonation(donation);
 
-            // Cộng dồn số lượng vào kho cho TẤT CẢ các vật phẩm trong đơn
-            foreach (var donationTransaction in donationEntity.DonationTransactions)
+            foreach (var dt in donation.DonationTransactions)
             {
-                var transaction = await _donationRepository.GetTransactionByIdAsync(donationTransaction.TransactionId, cancellationToken);
-                if (transaction != null)
+                if (dt.WarehouseTransactions != null)
                 {
-                    var warehouseInventory = await _donationRepository.GetWarehouseInventoryByIdAsync(transaction.WarehouseInventoryId, cancellationToken);
-                    if (warehouseInventory != null)
+                    var transaction = dt.WarehouseTransactions;
+                    var inventory = await _donationRepository.GetWarehouseInventoryWithTrackingAsync(transaction.WarehouseInventoryId, cancellationToken);
+                    if (inventory != null)
                     {
-                        int newQuantity = warehouseInventory.Quantity + transaction.Quantity;
-                        warehouseInventory.UpdateQuantity(newQuantity);
+                        inventory.AddQuantity(transaction.Quantity); // Gọi phương thức domain
+                        _donationRepository.UpdateWarehouseInventory(inventory);
                     }
                 }
             }
@@ -319,15 +299,16 @@ namespace RescueHub.Domain.Services
 
         public async Task<bool> ConfirmDonationRejectedAsync(Guid donationId, Guid coordinatorId, CancellationToken cancellationToken)
         {
-            var donationEntity = await _donationRepository.GetDonationByIdAsync(donationId, cancellationToken);
-            if (donationEntity == null) return false;
+            var donation = await _donationRepository.GetDonationWithTrackingAsync(donationId, cancellationToken);
+            if (donation == null) return false;
 
-            if (donationEntity.Status != DonationStatus.Pending)
+            if (donation.Status != DonationStatus.Pending)
             {
                 throw new InvalidOperationException("Chỉ có thể xác nhận từ chối cho các đơn đang ở trạng thái Pending.");
             }
 
-            donationEntity.UpdateStatus(DonationStatus.Rejected, coordinatorId);
+            donation.Reject(coordinatorId); // Gọi phương thức domain
+            _donationRepository.UpdateDonation(donation);
             return true;
         }
 
