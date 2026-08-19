@@ -8,6 +8,7 @@ using RescueHub.Domain.Interfaces.Auth;
 using RescueHub.Domain.Interfaces.Notifications;
 using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Domain.Interfaces.Donations;
+using RescueHub.Domain.Interfaces.Volunteers;
 using RescueHub.Domain.Services;
 using System.Reflection;
 
@@ -41,6 +42,7 @@ namespace RescueHub.Application
             services.AddScoped<IAuditLogService, AuditLogService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IDonationService, DonationService>();
+            services.AddScoped<IVolunteerService, VolunteerService>();
 
             return services;
         }

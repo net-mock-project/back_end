@@ -40,6 +40,9 @@ namespace RescueHub.API.Common
                     (HttpStatusCode.NotFound,
                     new[] { exception.Message }),
 
+                ConflictException =>
+                    (HttpStatusCode.Conflict,
+                    new[] { exception.Message }),
 
                 // 400
                 ArgumentException =>

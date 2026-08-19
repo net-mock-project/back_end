@@ -7,6 +7,7 @@ using RescueHub.Domain.Interfaces.AuditLogs;
 using RescueHub.Domain.Interfaces.Auth;
 using RescueHub.Domain.Interfaces.Notifications;
 using RescueHub.Domain.Interfaces.Users;
+using RescueHub.Domain.Interfaces.Volunteers;
 using RescueHub.Domain.Interfaces.Donations;
 using RescueHub.Infrastructure.SqlServer.Persistence;
 using RescueHub.Infrastructure.SqlServer.Repositories;
@@ -47,6 +48,7 @@ namespace RescueHub.Infrastructure.SqlServer
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAuditLogRepository, AuditLogRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<IVolunteerRepository, VolunteerRepository>();
 
             // Đăng ký Donation Repository
             services.AddScoped<IDonationRepository, DonationRepository>();

@@ -129,6 +129,21 @@ namespace RescueHub.Domain.Entities
             TaskCompletedCount = taskCompletedCount;
         }
 
+        // Thay đổi Role của User
+        public void ChangeRole(Guid newRoleId)
+        {
+            if (newRoleId == Guid.Empty)
+                throw new ArgumentException(
+                    "Role ID cannot be empty.",
+                    nameof(newRoleId));
+
+            if (RoleId == newRoleId)
+                return;
+
+            RoleId = newRoleId;
+            MarkUpdated();
+        }
+
         // Chỉ cập nhật khi dữ liệu thực sự thay đổi
         public void UpdateProfile(
             string? fullName,

@@ -4,14 +4,18 @@ using RescueHub.API.Models.Auth;
 using RescueHub.API.Models.Notifications;
 using RescueHub.API.Models.Users;
 using RescueHub.API.Models.Donation;
+using RescueHub.API.Models.Volunteers;
 using RescueHub.Application.Contracts.AuditLogs;
 using RescueHub.Application.Contracts.Notifications;
 using RescueHub.Application.Contracts.Querying;
 using RescueHub.Application.Contracts.Users;
 using RescueHub.Application.Contracts.Donation;
+using RescueHub.Application.Contracts.Volunteers;
 using RescueHub.Application.Features.Auth.Commands;
 using RescueHub.Application.Features.Users.Commands;
 using RescueHub.Application.Features.Donations.Commands;
+using RescueHub.Application.Features.Volunteers.Commands;
+using RescueHub.Application.Contracts.Querying;
 
 namespace RescueHub.API.Mappings
 {
@@ -107,6 +111,13 @@ namespace RescueHub.API.Mappings
                     Guid.Empty
                 ));
 
+            config.NewConfig<SubmitVolunteerProfileRequest, SubmitVolunteerProfileCommand>()
+                .MapWith(request => new SubmitVolunteerProfileCommand(
+                    Guid.Empty,
+                    request.ExperienceYears,
+                    request.CVUrl
+                ));
+
             config.NewConfig<AuditLogQueryRequest, QueryRequest>();
             config.NewConfig<NotificationQueryRequest, QueryRequest>();
 
@@ -114,15 +125,14 @@ namespace RescueHub.API.Mappings
             config.NewConfig<UserProfileDto, UserProfileResponse>();
             config.NewConfig<UserProfileDto, GetProfileResponse>();
             config.NewConfig<UserListDto, UserListResponse>();
-            config.NewConfig<
-                PaginationResponse<UserListDto>,
-                PaginationResponse<UserListResponse>>();
+            config.NewConfig<PaginationResponse<UserListDto>, PaginationResponse<UserListResponse>>();
             config.NewConfig<UserDetailDto, UserDetailResponse>();
             config.NewConfig<CreateUserDto, CreateUserResponse>();
             config.NewConfig<UserStatusDto, UserStatusResponse>();
             config.NewConfig<AuditLogDto, AuditLogResponse>();
             config.NewConfig<NotificationDto, NotificationResponse>();
             config.NewConfig<DonationDto, GetMyDonationResponse>();
+            config.NewConfig<VolunteerProfileDto, VolunteerProfileResponse>();
         }
     }
 }
