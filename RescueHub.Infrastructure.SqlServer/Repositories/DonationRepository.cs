@@ -342,15 +342,13 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             return models.Select(MapToDonationDomain).ToList();
         }
 
-        // =========================================================================
-        // CÁC HÀM TRACKING & CẬP NHẬT (SỬ DỤNG DOMAIN ENTITY THEO INTERFACE MỚI)
-        // =========================================================================
+       
+        // CÁC HÀM TRACKING & CẬP NHẬT
+        
 
         public async Task<Donation?> GetDonationWithTrackingAsync(Guid donationId, CancellationToken cancellationToken)
         {
-            // Trả về thẳng DataModel nhưng gán ẩn dưới dạng truy vấn theo Tracking, 
-            // hoặc query trực tiếp rồi map sang Entity (hoặc lưu ý Service cần DataModel). 
-            // Cách chuẩn nhất cho Clean Architecture là lấy DataModel từ DbContext để EF Core Tracking thay đổi:
+           
             var model = await _context.Donations
                 .Include(d => d.Transactions)
                 .FirstOrDefaultAsync(d => d.Id == donationId, cancellationToken);
@@ -408,7 +406,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
 
         public void UpdateDonation(Donation donation)
         {
-            // Map từ Domain Entity ngược lại thành DataModel để EF Core cập nhật state
+            // Map từ Domain Entity ngược lại thành DataModel
             var model = _context.Donations.Find(donation.Id);
             if (model != null)
             {
@@ -444,9 +442,8 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             }
         }
 
-        // =========================================================================
+        
         // Helper method để map DonationDataModel sang Donation Domain Entity
-        // =========================================================================
         private static Donation MapToDonationDomain(DonationDataModel model)
         {
             var donation = new Donation(

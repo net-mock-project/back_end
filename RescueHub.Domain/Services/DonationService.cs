@@ -158,7 +158,7 @@ namespace RescueHub.Domain.Services
 
             if (donationDate.HasValue)
             {
-                donation.UpdateDate(donationDate.Value); // Dùng phương thức Domain
+                donation.UpdateDate(donationDate.Value); 
             }
 
             if (items != null && items.Any())
@@ -257,7 +257,7 @@ namespace RescueHub.Domain.Services
                 throw new InvalidOperationException("Không thể hủy đơn quyên góp đã được duyệt hoặc đã hoàn thành.");
             }
 
-            donation.Cancel(); // Gọi phương thức domain
+            donation.Cancel(); 
             _donationRepository.UpdateDonation(donation);
             return true;
         }
@@ -277,7 +277,7 @@ namespace RescueHub.Domain.Services
                 throw new InvalidOperationException("Chỉ có thể xác nhận nhận đồ cho các đơn đang ở trạng thái Pending.");
             }
 
-            donation.Complete(coordinatorId); // Gọi phương thức domain
+            donation.Complete(coordinatorId); 
             _donationRepository.UpdateDonation(donation);
 
             foreach (var dt in donation.DonationTransactions)
@@ -288,7 +288,7 @@ namespace RescueHub.Domain.Services
                     var inventory = await _donationRepository.GetWarehouseInventoryWithTrackingAsync(transaction.WarehouseInventoryId, cancellationToken);
                     if (inventory != null)
                     {
-                        inventory.AddQuantity(transaction.Quantity); // Gọi phương thức domain
+                        inventory.AddQuantity(transaction.Quantity); 
                         _donationRepository.UpdateWarehouseInventory(inventory);
                     }
                 }
@@ -307,7 +307,7 @@ namespace RescueHub.Domain.Services
                 throw new InvalidOperationException("Chỉ có thể xác nhận từ chối cho các đơn đang ở trạng thái Pending.");
             }
 
-            donation.Reject(coordinatorId); // Gọi phương thức domain
+            donation.Reject(coordinatorId); 
             _donationRepository.UpdateDonation(donation);
             return true;
         }

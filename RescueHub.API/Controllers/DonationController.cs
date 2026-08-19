@@ -12,7 +12,7 @@ namespace RescueHub.API.Controllers
 {
     [ApiController]
     [Route("api/me")]
-    //[Authorize]
+    [Authorize]
     public class DonationController : ControllerBase
     {
         private readonly ISender _sender;
@@ -36,7 +36,7 @@ namespace RescueHub.API.Controllers
                 return Unauthorized();
             }
 
-            var query = new GetMyDonationQuery(userId);
+            var query = new GetMyDonationQuery(userId.Value);
 
             var result = await _sender.Send(query, cancellationToken);
 
@@ -65,7 +65,7 @@ namespace RescueHub.API.Controllers
             var command = _mapper.Map<CreateDonationCommand>(request)
                 with
             {
-                DonatorId = userId
+                DonatorId = userId.Value
             };
 
             var result = await _sender.Send(command, cancellationToken);
@@ -96,7 +96,7 @@ namespace RescueHub.API.Controllers
             var command = _mapper.Map<UpdateDonationCommand>(request)
                 with
             {
-                UserId = userId,
+                UserId = userId.Value,
                 DonationId = donationId
             };
 
@@ -125,7 +125,7 @@ namespace RescueHub.API.Controllers
                 return Unauthorized();
             }
 
-            var command = new CancelDonationCommand(userId, donationId);
+            var command = new CancelDonationCommand(userId.Value, donationId);
             var success = await _sender.Send(command, cancellationToken);
 
             if (!success)
@@ -137,11 +137,13 @@ namespace RescueHub.API.Controllers
         }
 
         // Lấy UserId từ token đăng nhập
-        // Thay vì đọc từ token đang bị rỗng, bạn viết tạm như thế này:
-        protected Guid GetCurrentUserId()
+        private Guid? GetCurrentUserId()
         {
-            // Trả về cứng ID của user test để không bị lỗi 401 nữa
-            return Guid.Parse("20000000-0000-0000-0000-000000000001");
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            return Guid.TryParse(userIdValue, out var userId)
+                ? userId
+                : null;
         }
     }
 }
