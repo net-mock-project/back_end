@@ -1,24 +1,23 @@
 ﻿using RescueHub.Domain.Common.Enums;
 using RescueHub.Domain.Entities;
 using RescueHub.Domain.Common.Querying;
-using RescueHub.Domain.ReadModels.Users;
 
 namespace RescueHub.Domain.Interfaces.Users
 {
     public interface IUserService
     {
         // Lấy thông tin Profile
-        Task<UserProfileItem?> GetProfileAsync(
+        Task<User?> GetProfileAsync(
             Guid userId,
             CancellationToken cancellationToken);
 
         // Lấy danh sách User có phân trang
-        Task<PagedResult<UserListItem>> GetUsersAsync(
+        Task<PagedResult<User>> GetUsersAsync(
             QueryCriteria criteria,
             CancellationToken cancellationToken);
 
         // Lấy chi tiết User cho Admin
-        Task<UserDetailItem?> GetUserDetailAsync(
+        Task<User?> GetUserDetailAsync(
             Guid userId,
             CancellationToken cancellationToken);
 

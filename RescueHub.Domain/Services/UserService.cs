@@ -2,7 +2,6 @@
 using RescueHub.Domain.Entities;
 using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Domain.Common.Querying;
-using RescueHub.Domain.ReadModels.Users;
 
 namespace RescueHub.Domain.Services
 {
@@ -15,16 +14,16 @@ namespace RescueHub.Domain.Services
             _userRepository = userRepository;
         }
 
-        public async Task<UserProfileItem?> GetProfileAsync(
-             Guid userId,
-             CancellationToken cancellationToken)
+        public async Task<User?> GetProfileAsync(
+            Guid userId,
+            CancellationToken cancellationToken)
         {
             return await _userRepository.GetProfileByIdAsync(
                 userId,
                 cancellationToken);
         }
 
-        public async Task<PagedResult<UserListItem>> GetUsersAsync(
+        public async Task<PagedResult<User>> GetUsersAsync(
             QueryCriteria criteria,
             CancellationToken cancellationToken)
         {
@@ -33,7 +32,7 @@ namespace RescueHub.Domain.Services
                 cancellationToken);
         }
 
-        public async Task<UserDetailItem?> GetUserDetailAsync(
+        public async Task<User?> GetUserDetailAsync(
             Guid userId,
             CancellationToken cancellationToken)
         {

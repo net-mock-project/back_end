@@ -7,6 +7,8 @@ namespace RescueHub.Domain.Entities
     {
         public Guid RoleId { get; private set; }
 
+        public string? RoleName { get; private set; }
+
         public GeoLocation? Location { get; private set; }
 
         public string? Province { get; private set; }
@@ -28,6 +30,12 @@ namespace RescueHub.Domain.Entities
         public UserStatus Status { get; private set; } = UserStatus.Active;
 
         public bool IsVerified { get; private set; }
+
+        public int ReliefRequestCount { get; private set; }
+
+        public int DonationCount { get; private set; }
+
+        public int TaskCompletedCount { get; private set; }
 
         private User() { }
 
@@ -94,10 +102,15 @@ namespace RescueHub.Domain.Entities
             bool isVerified,
             DateTime createdAt,
             DateTime? updatedAt,
-            DateTime? deletedAt)
+            DateTime? deletedAt,
+            string? roleName = null,
+            int reliefRequestCount = 0,
+            int donationCount = 0,
+            int taskCompletedCount = 0)
             : base(id, createdAt, updatedAt, deletedAt)
         {
             RoleId = roleId;
+            RoleName = roleName;
             Location = location;
             Province = province;
             ProfileUrl = profileUrl;
@@ -109,6 +122,9 @@ namespace RescueHub.Domain.Entities
             PasswordHash = passwordHash;
             Status = status;
             IsVerified = isVerified;
+            ReliefRequestCount = reliefRequestCount;
+            DonationCount = donationCount;
+            TaskCompletedCount = taskCompletedCount;
         }
 
         // Chỉ cập nhật khi dữ liệu thực sự thay đổi

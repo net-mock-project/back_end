@@ -38,7 +38,7 @@ namespace RescueHub.Application.Features.Users.Queries
                 criteria,
                 cancellationToken);
 
-            // Chuyển read model sang DTO
+            // Chuyển Domain User sang DTO
             var items =
                 result.Items.Adapt<List<UserListDto>>();
 

@@ -5,7 +5,6 @@ using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Infrastructure.SqlServer.Models;
 using RescueHub.Infrastructure.SqlServer.Persistence;
 using RescueHub.Domain.Common.Querying;
-using RescueHub.Domain.ReadModels.Users;
 
 namespace RescueHub.Infrastructure.SqlServer.Repositories
 {
@@ -31,33 +30,34 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
         }
 
         // Lấy thông tin Profile kèm RoleName
-        public async Task<UserProfileItem?> GetProfileByIdAsync(
+        public async Task<User?> GetProfileByIdAsync(
             Guid userId,
             CancellationToken cancellationToken)
         {
-            return await _dbContext.Users
+            var result = await _dbContext.Users
                 .AsNoTracking()
                 .Where(u =>
                     u.Id == userId &&
                     u.DeletedAt == null)
-                .Select(u => new UserProfileItem
+                .Select(u => new
                 {
-                    Id = u.Id,
-                    RoleId = u.RoleId,
-                    RoleName = u.Role.Name,
-                    FullName = u.FullName,
-                    Email = u.Email,
-                    Phone = u.Phone,
-                    DateOfBirth = u.DateOfBirth,
-                    Gender = u.Gender,
-                    Province = u.Province,
-                    ProfileUrl = u.ProfileUrl
+                    User = u,
+                    RoleName = u.Role.Name
                 })
                 .FirstOrDefaultAsync(cancellationToken);
+
+            if (result == null)
+            {
+                return null;
+            }
+
+            return MapToDomain(
+                result.User,
+                result.RoleName);
         }
 
         // Lấy danh sách User có phân trang
-        public async Task<PagedResult<UserListItem>> GetPagedAsync(
+        public async Task<PagedResult<User>> GetPagedAsync(
             QueryCriteria criteria,
             CancellationToken cancellationToken)
         {
@@ -76,78 +76,59 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                     u.Phone.Contains(search));
             }
 
-            // Tổng số User trước khi phân trang
             var totalCount = await query.CountAsync(
                 cancellationToken);
 
-            // Lấy dữ liệu của trang hiện tại
-            var items = await query
+            var data = await query
                 .OrderByDescending(u => u.CreatedAt)
                 .ThenBy(u => u.Id)
                 .Skip(
                     (criteria.PageNumber - 1)
                     * criteria.PageSize)
                 .Take(criteria.PageSize)
-                .Select(u => new UserListItem
+                .Select(u => new
                 {
-                    Id = u.Id,
-                    RoleId = u.RoleId,
-                    RoleName = u.Role.Name,
-                    FullName = u.FullName,
-                    Email = u.Email,
-                    Phone = u.Phone,
-                    Province = u.Province,
-                    Status = u.Status,
-                    IsVerified = u.IsVerified,
-                    CreatedAt = u.CreatedAt
+                    User = u,
+                    RoleName = u.Role.Name
                 })
                 .ToListAsync(cancellationToken);
 
-            return new PagedResult<UserListItem>(
+            var items = data
+                .Select(x =>
+                    MapToDomain(
+                        x.User,
+                        x.RoleName)!)
+                .ToList();
+
+            return new PagedResult<User>(
                 items,
                 totalCount);
         }
 
         // Lấy chi tiết User theo Id
-        public async Task<UserDetailItem?> GetDetailByIdAsync(
+        public async Task<User?> GetDetailByIdAsync(
             Guid userId,
             CancellationToken cancellationToken)
         {
-            return await _dbContext.Users
+            var result = await _dbContext.Users
                 .AsNoTracking()
                 .Where(u =>
                     u.Id == userId &&
                     u.DeletedAt == null)
-                .Select(u => new UserDetailItem
+                .Select(u => new
                 {
-                    Id = u.Id,
-                    RoleId = u.RoleId,
+                    User = u,
+
                     RoleName = u.Role.Name,
 
-                    FullName = u.FullName,
-                    Email = u.Email,
-                    Phone = u.Phone,
-                    ProfileUrl = u.ProfileUrl,
+                    ReliefRequestCount =
+                        u.ReliefRequests.Count(
+                            r => r.DeletedAt == null),
 
-                    DateOfBirth = u.DateOfBirth,
-                    Gender = u.Gender,
-                    Province = u.Province,
+                    DonationCount =
+                        u.Donations.Count(
+                            d => d.DeletedAt == null),
 
-                    Status = u.Status,
-                    IsVerified = u.IsVerified,
-
-                    CreatedAt = u.CreatedAt,
-                    UpdatedAt = u.UpdatedAt,
-
-                    // Tổng số yêu cầu cứu trợ do User tạo
-                    ReliefRequestCount = u.ReliefRequests.Count(
-                        r => r.DeletedAt == null),
-
-                    // Tổng số Donation của User
-                    DonationCount = u.Donations.Count(
-                        d => d.DeletedAt == null),
-
-                    // Tổng số Task Volunteer đã hoàn thành
                     TaskCompletedCount =
                         u.Volunteer == null
                             ? 0
@@ -158,6 +139,18 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                                         TaskAssignmentStatus.Completed)
                 })
                 .FirstOrDefaultAsync(cancellationToken);
+
+            if (result == null)
+            {
+                return null;
+            }
+
+            return MapToDomain(
+                result.User,
+                result.RoleName,
+                result.ReliefRequestCount,
+                result.DonationCount,
+                result.TaskCompletedCount);
         }
 
         public async Task<bool> UpdateAsync(User user, CancellationToken cancellationToken)
@@ -306,7 +299,12 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
         }
 
         // Chuyển Data Model sang Domain Entity
-        private User? MapToDomain(UserDataModel? dataModel)
+        private User? MapToDomain(
+            UserDataModel? dataModel,
+            string? roleName = null,
+            int reliefRequestCount = 0,
+            int donationCount = 0,
+            int taskCompletedCount = 0)
         {
             if (dataModel == null)
             {
@@ -338,7 +336,11 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 dataModel.IsVerified,
                 dataModel.CreatedAt,
                 dataModel.UpdatedAt,
-                dataModel.DeletedAt);
+                dataModel.DeletedAt,
+                roleName,
+                reliefRequestCount,
+                donationCount,
+                taskCompletedCount);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using RescueHub.Domain.Entities;
 using RescueHub.Domain.Common.Querying;
-using RescueHub.Domain.ReadModels.Users;
 
 namespace RescueHub.Domain.Interfaces.Users
 {
@@ -10,17 +9,17 @@ namespace RescueHub.Domain.Interfaces.Users
         Task<User?> GetByIdAsync(Guid userId, CancellationToken cancellationToken);
 
         // Lấy thông tin Profile kèm Role
-        Task<UserProfileItem?> GetProfileByIdAsync(
+        Task<User?> GetProfileByIdAsync(
             Guid userId,
             CancellationToken cancellationToken);
 
         // Lấy danh sách User có phân trang
-        Task<PagedResult<UserListItem>> GetPagedAsync(
+        Task<PagedResult<User>> GetPagedAsync(
             QueryCriteria criteria,
             CancellationToken cancellationToken);
 
         // Lấy chi tiết User theo Id
-        Task<UserDetailItem?> GetDetailByIdAsync(
+        Task<User?> GetDetailByIdAsync(
             Guid userId,
             CancellationToken cancellationToken);
 
