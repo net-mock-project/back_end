@@ -171,7 +171,7 @@ namespace RescueHub.Domain.Entities
         // Khóa tài khoản User
         public void LockAccount()
         {
-            if (Status == UserStatus.Suspended)
+            if (Status != UserStatus.Active)
                 return;
 
             Status = UserStatus.Suspended;
@@ -181,7 +181,7 @@ namespace RescueHub.Domain.Entities
         // Mở khóa tài khoản User
         public void UnlockAccount()
         {
-            if (Status == UserStatus.Active)
+            if (Status != UserStatus.Suspended)
                 return;
 
             Status = UserStatus.Active;

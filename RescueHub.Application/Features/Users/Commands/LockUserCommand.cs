@@ -82,7 +82,7 @@ public class LockUserCommandHandler
 
                 var auditLog = new AuditLog(
                     request.PerformedByUserId,
-                    "Unlock",
+                    "Lock",
                     "User",
                     user.Id,
                     oldValue,
