@@ -342,15 +342,22 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             return models.Select(MapToDonationDomain).ToList();
         }
 
-       
+
         // CÁC HÀM TRACKING & CẬP NHẬT
-        
+
 
         public async Task<Donation?> GetDonationWithTrackingAsync(Guid donationId, CancellationToken cancellationToken)
         {
-           
             var model = await _context.Donations
+                .Include(d => d.Donator)
                 .Include(d => d.Transactions)
+                    .ThenInclude(dt => dt.Transaction)
+                        .ThenInclude(t => t.WarehouseInventory)
+                            .ThenInclude(wi => wi.Warehouse)
+                .Include(d => d.Transactions)
+                    .ThenInclude(dt => dt.Transaction)
+                        .ThenInclude(t => t.WarehouseInventory)
+                            .ThenInclude(wi => wi.Supply)
                 .FirstOrDefaultAsync(d => d.Id == donationId, cancellationToken);
 
             return model != null ? MapToDonationDomain(model) : null;
@@ -359,7 +366,15 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
         public async Task<Donation?> GetDonationWithTrackingByIdAndUserIdAsync(Guid donationId, Guid userId, CancellationToken cancellationToken)
         {
             var model = await _context.Donations
+                .Include(d => d.Donator)
                 .Include(d => d.Transactions)
+                    .ThenInclude(dt => dt.Transaction)
+                        .ThenInclude(t => t.WarehouseInventory)
+                            .ThenInclude(wi => wi.Warehouse)
+                .Include(d => d.Transactions)
+                    .ThenInclude(dt => dt.Transaction)
+                        .ThenInclude(t => t.WarehouseInventory)
+                            .ThenInclude(wi => wi.Supply)
                 .FirstOrDefaultAsync(d => d.Id == donationId && d.DonatorId == userId, cancellationToken);
 
             return model != null ? MapToDonationDomain(model) : null;
