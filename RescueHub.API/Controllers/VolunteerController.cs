@@ -36,13 +36,11 @@ namespace RescueHub.API.Controllers
             CancellationToken cancellationToken)
         {
             var userId = GetCurrentUserId();
-
             if (userId == null)
             {
-                return Unauthorized();
+                throw new UnauthorizedAccessException("User is not authenticated.");
             }
 
-            // Map Request sang Command và gắn UserId từ token
             var command = _mapper
                 .Map<SubmitVolunteerProfileCommand>(request)
                 with
@@ -60,16 +58,13 @@ namespace RescueHub.API.Controllers
                     "Volunteer profile already exists.");
             }
 
-            // Map DTO sang Response
-            var response =
-                _mapper.Map<VolunteerProfileResponse>(result);
-
+            var response = _mapper.Map<VolunteerProfileResponse>(result);
             return Ok(response);
         }
 
-        // Requester cập nhật lại hồ sơ của mình
+        // Cập nhật lại hồ sơ Volunteer
         [HttpPut("profile")]
-        [Authorize(Roles = "Requester")]
+        [Authorize]
         public async Task<IActionResult> UpdateVolunteerProfile(
             [FromBody] UpdateVolunteerProfileRequest request,
             CancellationToken cancellationToken)
@@ -95,25 +90,44 @@ namespace RescueHub.API.Controllers
             return Ok(response);
         }
 
+        // Hủy đơn đăng ký hồ sơ Volunteer đang chờ duyệt
+        [HttpDelete("profile")]
+        [Authorize(Roles = "Requester")]
+        public async Task<IActionResult> CancelVolunteerProfile(
+            CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+
+            var command = new CancelVolunteerProfileCommand(userId.Value);
+            var isSuccess = await _sender.Send(command, cancellationToken);
+
+            if (!isSuccess)
+            {
+                throw new NotFoundException(
+                    "Volunteer application not found or cannot be cancelled.");
+            }
+
+            return Ok(new { message = "Volunteer application cancelled successfully." });
+        }
+
         // Lấy hồ sơ Volunteer của User hiện tại
         [HttpGet("profile")]
-        [Authorize(Roles = "Requester")]
+        [Authorize]
         public async Task<IActionResult> GetProfile(
             CancellationToken cancellationToken)
         {
             var userId = GetCurrentUserId();
-
             if (userId == null)
             {
-                return Unauthorized();
+                throw new UnauthorizedAccessException("User is not authenticated.");
             }
 
-            var query = new GetVolunteerProfileQuery(
-                userId.Value);
-
-            var result = await _sender.Send(
-                query,
-                cancellationToken);
+            var query = new GetVolunteerProfileQuery(userId.Value);
+            var result = await _sender.Send(query, cancellationToken);
 
             if (result == null)
             {
@@ -121,12 +135,11 @@ namespace RescueHub.API.Controllers
                     $"Volunteer profile for User '{userId}' not found.");
             }
 
-            var response =
-                _mapper.Map<VolunteerProfileResponse>(result);
-
+            var response = _mapper.Map<VolunteerProfileResponse>(result);
             return Ok(response);
         }
 
+        // Coordinator lấy danh sách hồ sơ chờ duyệt (phân trang, lọc, tìm kiếm)
         [HttpGet("pending")]
         [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> GetPendingVolunteerProfiles(
@@ -160,7 +173,7 @@ namespace RescueHub.API.Controllers
             return Ok(result);
         }
 
-        // Coordinator xem chi tiết một hồ sơ Volunteer
+        // Coordinator xem chi tiết một hồ sơ Volunteer bất kỳ theo Id
         [HttpGet("{id:guid}")]
         [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> GetVolunteerProfileById(
@@ -173,7 +186,8 @@ namespace RescueHub.API.Controllers
 
             if (result == null)
             {
-                throw new NotFoundException($"Volunteer profile with ID '{id}' was not found.");
+                throw new NotFoundException(
+                    $"Volunteer profile with ID '{id}' was not found.");
             }
 
             var response = _mapper.Map<VolunteerProfileResponse>(result);
@@ -190,7 +204,7 @@ namespace RescueHub.API.Controllers
             var approverId = GetCurrentUserId();
             if (approverId == null)
             {
-                return Unauthorized();
+                throw new UnauthorizedAccessException("User is not authenticated.");
             }
 
             var command = new ApproveVolunteerProfileCommand(id, approverId.Value);
@@ -206,20 +220,25 @@ namespace RescueHub.API.Controllers
             return Ok(response);
         }
 
-        // Coordinator từ chối hồ sơ Volunteer
+        // Coordinator từ chối hồ sơ Volunteer kèm lý do tùy chọn
         [HttpPatch("{id:guid}/reject")]
         [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> RejectProfile(
             [FromRoute] Guid id,
+            [FromBody] RejectVolunteerProfileRequest? request,
             CancellationToken cancellationToken)
         {
             var approverId = GetCurrentUserId();
             if (approverId == null)
             {
-                return Unauthorized();
+                throw new UnauthorizedAccessException("User is not authenticated.");
             }
 
-            var command = new RejectVolunteerProfileCommand(id, approverId.Value);
+            var command = new RejectVolunteerProfileCommand(
+                id,
+                approverId.Value,
+                request?.Reason);
+
             var result = await _sender.Send(command, cancellationToken);
 
             if (result == null)
@@ -232,16 +251,12 @@ namespace RescueHub.API.Controllers
             return Ok(response);
         }
 
-        // Lấy UserId từ token đăng nhập
+        // Lấy UserId từ Claims của JWT token
         private Guid? GetCurrentUserId()
         {
-            var userIdValue =
-                User.FindFirstValue(
-                    ClaimTypes.NameIdentifier);
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            return Guid.TryParse(
-                userIdValue,
-                out var userId)
+            return Guid.TryParse(userIdValue, out var userId)
                 ? userId
                 : null;
         }

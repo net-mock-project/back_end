@@ -25,6 +25,10 @@ namespace RescueHub.Domain.Interfaces.Volunteers
             IEnumerable<(Guid SkillId, int Level)> skills,
             CancellationToken cancellationToken);
 
+        Task<bool> CancelProfileAsync(
+            Guid volunteerId,
+            CancellationToken cancellationToken);
+
         Task<PagedResult<Volunteer>> GetPendingProfilesAsync(
             QueryCriteria criteria,
             CancellationToken cancellationToken);

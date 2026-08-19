@@ -85,6 +85,22 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             }
         }
 
+        public async Task<bool> DeleteAsync(
+            Guid volunteerId,
+            CancellationToken cancellationToken)
+        {
+            var dataModel = await _dbContext.Volunteers
+                .FirstOrDefaultAsync(v => v.Id == volunteerId && v.DeletedAt == null, cancellationToken);
+
+            if (dataModel == null)
+            {
+                return false;
+            }
+
+            dataModel.DeletedAt = DateTime.UtcNow;
+            return true;
+        }
+
         public async Task<PagedResult<Volunteer>> GetPendingPagedAsync(
             QueryCriteria criteria,
             CancellationToken cancellationToken)

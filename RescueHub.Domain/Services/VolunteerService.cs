@@ -24,7 +24,12 @@ namespace RescueHub.Domain.Services
             Guid volunteerId,
             CancellationToken cancellationToken)
         {
-            return await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
+            var volunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
+
+            if (volunteer == null || volunteer.DeletedAt != null)
+                return null;
+
+            return volunteer;
         }
 
         public async Task<Volunteer?> CreateProfileAsync(
@@ -35,13 +40,40 @@ namespace RescueHub.Domain.Services
             CancellationToken cancellationToken)
         {
             var existingVolunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
-            if (existingVolunteer != null)
+
+            // 1. Đã có hồ sơ và đang hoạt động -> Không cho tạo đè
+            if (existingVolunteer != null && existingVolunteer.DeletedAt == null)
                 return null;
 
             var volunteerSkills = skills.Select(s =>
                 new VolunteerSkill(volunteerId, s.SkillId, s.Level)
             ).ToList();
 
+            // 2. Đã từng có hồ sơ nhưng đã bị xóa mềm -> Khôi phục và cập nhật lại thông tin mới
+            if (existingVolunteer != null && existingVolunteer.DeletedAt != null)
+            {
+                var reactivatedVolunteer = new Volunteer(
+                    volunteerId,
+                    experienceYears,
+                    VolunteerApprovalStatus.Pending,
+                    cvUrl,
+                    approvedBy: null,
+                    approvedAt: null,
+                    createdAt: existingVolunteer.CreatedAt,
+                    updatedAt: DateTime.UtcNow,
+                    deletedAt: null, // Reset xóa mềm
+                    skills: volunteerSkills,
+                    fullName: existingVolunteer.FullName,
+                    email: existingVolunteer.Email,
+                    phone: existingVolunteer.Phone,
+                    profileUrl: existingVolunteer.ProfileUrl,
+                    province: existingVolunteer.Province);
+
+                await _volunteerRepository.UpdateAsync(reactivatedVolunteer, cancellationToken);
+                return reactivatedVolunteer;
+            }
+
+            // 3. Chưa từng tạo hồ sơ -> Tạo mới hoàn toàn (INSERT)
             var volunteer = new Volunteer(
                 volunteerId,
                 experienceYears,
@@ -66,7 +98,9 @@ namespace RescueHub.Domain.Services
             CancellationToken cancellationToken)
         {
             var volunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
-            if (volunteer == null)
+
+            // Không cho phép cập nhật hồ sơ đã bị xóa mềm
+            if (volunteer == null || volunteer.DeletedAt != null)
                 return null;
 
             var volunteerSkills = skills.Select(s =>
@@ -92,6 +126,21 @@ namespace RescueHub.Domain.Services
 
             await _volunteerRepository.UpdateAsync(updatedVolunteer, cancellationToken);
             return updatedVolunteer;
+        }
+
+        public async Task<bool> CancelProfileAsync(
+            Guid volunteerId,
+            CancellationToken cancellationToken)
+        {
+            var volunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
+
+            // Chỉ cho phép hủy khi hồ sơ đang chờ duyệt
+            if (volunteer == null || volunteer.ApprovalStatus != VolunteerApprovalStatus.Pending)
+            {
+                return false;
+            }
+
+            return await _volunteerRepository.DeleteAsync(volunteerId, cancellationToken);
         }
 
         public Task<PagedResult<Volunteer>> GetPendingProfilesAsync(

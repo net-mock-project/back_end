@@ -17,6 +17,10 @@ namespace RescueHub.Domain.Interfaces.Volunteers
             Volunteer volunteer,
             CancellationToken cancellationToken);
 
+        Task<bool> DeleteAsync(
+            Guid volunteerId,
+            CancellationToken cancellationToken);
+
         Task<PagedResult<Volunteer>> GetPendingPagedAsync(
             QueryCriteria criteria,
             CancellationToken cancellationToken);
