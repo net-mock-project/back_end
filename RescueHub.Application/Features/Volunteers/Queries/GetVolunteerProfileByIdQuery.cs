@@ -3,32 +3,32 @@ using MediatR;
 using RescueHub.Application.Contracts.Volunteers;
 using RescueHub.Domain.Interfaces.Volunteers;
 
-namespace RescueHub.Application.Features.Volunteers.Queries
+namespace RescueHub.Application.Features.Volunteers.Queries;
+
+public record GetVolunteerProfileByIdQuery(
+    Guid VolunteerId,
+    Guid CoordinatorId
+) : IRequest<VolunteerProfileDto?>;
+
+public class GetVolunteerProfileByIdQueryHandler
+    : IRequestHandler<GetVolunteerProfileByIdQuery, VolunteerProfileDto?>
 {
-    public record GetVolunteerProfileByIdQuery(
-        Guid VolunteerId
-    ) : IRequest<VolunteerProfileDto?>;
+    private readonly IVolunteerService _volunteerService;
 
-    public class GetVolunteerProfileByIdQueryHandler
-        : IRequestHandler<GetVolunteerProfileByIdQuery, VolunteerProfileDto?>
+    public GetVolunteerProfileByIdQueryHandler(IVolunteerService volunteerService)
     {
-        private readonly IVolunteerService _volunteerService;
+        _volunteerService = volunteerService;
+    }
 
-        public GetVolunteerProfileByIdQueryHandler(
-            IVolunteerService volunteerService)
-        {
-            _volunteerService = volunteerService;
-        }
+    public async Task<VolunteerProfileDto?> Handle(
+        GetVolunteerProfileByIdQuery request,
+        CancellationToken cancellationToken)
+    {
+        var volunteer = await _volunteerService.GetProfileByIdForCoordinatorAsync(
+            request.VolunteerId,
+            request.CoordinatorId,
+            cancellationToken);
 
-        public async Task<VolunteerProfileDto?> Handle(
-            GetVolunteerProfileByIdQuery request,
-            CancellationToken cancellationToken)
-        {
-            var volunteer = await _volunteerService.GetProfileAsync(
-                request.VolunteerId,
-                cancellationToken);
-
-            return volunteer?.Adapt<VolunteerProfileDto>();
-        }
+        return volunteer?.Adapt<VolunteerProfileDto>();
     }
 }

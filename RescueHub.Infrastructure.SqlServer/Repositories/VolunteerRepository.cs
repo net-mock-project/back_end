@@ -102,12 +102,15 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
         }
 
         public async Task<PagedResult<Volunteer>> GetPendingPagedAsync(
+            string province,
             QueryCriteria criteria,
             CancellationToken cancellationToken)
         {
             var query = _dbContext.Volunteers
                 .AsNoTracking()
-                .Where(x => x.ApprovalStatus == VolunteerApprovalStatus.Pending && x.DeletedAt == null);
+                .Where(x => x.ApprovalStatus == VolunteerApprovalStatus.Pending &&
+                            x.DeletedAt == null &&
+                            x.User.Province == province);
 
             query = ApplySearch(query, criteria.Search);
             query = ApplyFilters(query, criteria.Filters);
@@ -123,12 +126,36 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                     .ThenInclude(vs => vs.Skill)
                 .ToListAsync(cancellationToken);
 
-            var items = dataModels
-                .Select(MapToDomain)
-                .Where(x => x != null)
-                .Select(x => x!)
-                .ToList();
+            var items = dataModels.Select(MapToDomain).Where(x => x != null).Select(x => x!).ToList();
+            return new PagedResult<Volunteer>(items, totalCount);
+        }
 
+        public async Task<PagedResult<Volunteer>> GetApprovedPagedAsync(
+            string province,
+            QueryCriteria criteria,
+            CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Volunteers
+                .AsNoTracking()
+                .Where(x => x.ApprovalStatus == VolunteerApprovalStatus.Approved &&
+                            x.DeletedAt == null &&
+                            x.User.Province == province);
+
+            query = ApplySearch(query, criteria.Search);
+            query = ApplyFilters(query, criteria.Filters);
+            query = ApplySorting(query, criteria.SortBy, criteria.SortDirection);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var dataModels = await query
+                .Skip((criteria.PageNumber - 1) * criteria.PageSize)
+                .Take(criteria.PageSize)
+                .Include(v => v.User)
+                .Include(v => v.VolunteerSkills)
+                    .ThenInclude(vs => vs.Skill)
+                .ToListAsync(cancellationToken);
+
+            var items = dataModels.Select(MapToDomain).Where(x => x != null).Select(x => x!).ToList();
             return new PagedResult<Volunteer>(items, totalCount);
         }
 

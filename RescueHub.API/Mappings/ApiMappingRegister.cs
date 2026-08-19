@@ -111,6 +111,7 @@ namespace RescueHub.API.Mappings
                     Guid.Empty
                 ));
 
+            // Volunteers (Requester)
             config.NewConfig<SubmitVolunteerProfileRequest, SubmitVolunteerProfileCommand>()
                 .MapWith(request => new SubmitVolunteerProfileCommand(
                     Guid.Empty,
@@ -124,6 +125,18 @@ namespace RescueHub.API.Mappings
             config.NewConfig<UpdateVolunteerProfileRequest, UpdateVolunteerProfileCommand>()
                 .MapWith(request => new UpdateVolunteerProfileCommand(
                     Guid.Empty,
+                    request.ExperienceYears,
+                    request.CVUrl,
+                    request.Skills
+                        .Select(s => new VolunteerSkillInput(s.SkillId, s.Level))
+                        .ToList()
+                ));
+
+            // Volunteers (Coordinator)
+            config.NewConfig<CoordinatorCreateVolunteerRequest, CreateVolunteerByCoordinatorCommand>()
+                .MapWith(request => new CreateVolunteerByCoordinatorCommand(
+                    Guid.Empty,
+                    request.UserId,
                     request.ExperienceYears,
                     request.CVUrl,
                     request.Skills

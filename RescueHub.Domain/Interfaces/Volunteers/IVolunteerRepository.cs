@@ -9,6 +9,16 @@ namespace RescueHub.Domain.Interfaces.Volunteers
             Guid volunteerId,
             CancellationToken cancellationToken);
 
+        Task<PagedResult<Volunteer>> GetPendingPagedAsync(
+            string province,
+            QueryCriteria criteria,
+            CancellationToken cancellationToken);
+
+        Task<PagedResult<Volunteer>> GetApprovedPagedAsync(
+            string province,
+            QueryCriteria criteria,
+            CancellationToken cancellationToken);
+
         Task AddAsync(
             Volunteer volunteer,
             CancellationToken cancellationToken);
@@ -19,14 +29,6 @@ namespace RescueHub.Domain.Interfaces.Volunteers
 
         Task<bool> DeleteAsync(
             Guid volunteerId,
-            CancellationToken cancellationToken);
-
-        Task<PagedResult<Volunteer>> GetPendingPagedAsync(
-            QueryCriteria criteria,
-            CancellationToken cancellationToken);
-
-        Task<PagedResult<Volunteer>> GetApprovedPagedAsync(
-            QueryCriteria criteria,
             CancellationToken cancellationToken);
     }
 }

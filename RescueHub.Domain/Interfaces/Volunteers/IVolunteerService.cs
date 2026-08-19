@@ -5,12 +5,15 @@ namespace RescueHub.Domain.Interfaces.Volunteers
 {
     public interface IVolunteerService
     {
-        // Lấy hồ sơ Volunteer
         Task<Volunteer?> GetProfileAsync(
             Guid volunteerId,
             CancellationToken cancellationToken);
 
-        // Đăng ký hồ sơ Volunteer
+        Task<Volunteer?> GetProfileByIdForCoordinatorAsync(
+            Guid volunteerId,
+            Guid coordinatorId,
+            CancellationToken cancellationToken);
+
         Task<Volunteer?> CreateProfileAsync(
             Guid volunteerId,
             int experienceYears,
@@ -30,6 +33,12 @@ namespace RescueHub.Domain.Interfaces.Volunteers
             CancellationToken cancellationToken);
 
         Task<PagedResult<Volunteer>> GetPendingProfilesAsync(
+            Guid coordinatorId,
+            QueryCriteria criteria,
+            CancellationToken cancellationToken);
+
+        Task<PagedResult<Volunteer>> GetApprovedProfilesAsync(
+            Guid coordinatorId,
             QueryCriteria criteria,
             CancellationToken cancellationToken);
 
@@ -43,8 +52,26 @@ namespace RescueHub.Domain.Interfaces.Volunteers
             Guid approverId,
             CancellationToken cancellationToken);
 
-        Task<PagedResult<Volunteer>> GetApprovedProfilesAsync(
-            QueryCriteria criteria,
+        // CRUD dành riêng cho Coordinator
+        Task<Volunteer?> CreateByCoordinatorAsync(
+            Guid coordinatorId,
+            Guid targetUserId,
+            int experienceYears,
+            string? cvUrl,
+            IEnumerable<(Guid SkillId, int Level)> skills,
+            CancellationToken cancellationToken);
+
+        Task<Volunteer?> UpdateByCoordinatorAsync(
+            Guid coordinatorId,
+            Guid targetVolunteerId,
+            int experienceYears,
+            string? cvUrl,
+            IEnumerable<(Guid SkillId, int Level)> skills,
+            CancellationToken cancellationToken);
+
+        Task<bool> DeleteByCoordinatorAsync(
+            Guid coordinatorId,
+            Guid targetVolunteerId,
             CancellationToken cancellationToken);
     }
 }
