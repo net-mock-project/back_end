@@ -18,6 +18,9 @@ namespace RescueHub.Application.Mappings
 
             // Map Domain Entity sang DTO
             config.NewConfig<User, UserProfileDto>();
+            config.NewConfig<User, UserListDto>();
+            config.NewConfig<User, UserDetailDto>();
+            config.NewConfig<User, UserStatusDto>();
             config.NewConfig<AuditLog, AuditLogDto>();
             config.NewConfig<Notification, NotificationDto>()
                 .Map(dest => dest.Type, src => src.Type.ToString());

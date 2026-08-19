@@ -7,6 +7,8 @@ namespace RescueHub.Domain.Entities
     {
         public Guid RoleId { get; private set; }
 
+        public string? RoleName { get; private set; }
+
         public GeoLocation? Location { get; private set; }
 
         public string? Province { get; private set; }
@@ -29,7 +31,59 @@ namespace RescueHub.Domain.Entities
 
         public bool IsVerified { get; private set; }
 
+        public int ReliefRequestCount { get; private set; }
+
+        public int DonationCount { get; private set; }
+
+        public int TaskCompletedCount { get; private set; }
+
         private User() { }
+
+        // Dùng khi tạo mới User
+        public User(
+            Guid roleId,
+            string? province,
+            string fullName,
+            string email,
+            string phone,
+            DateOnly? dateOfBirth,
+            Gender? gender,
+            string passwordHash,
+            bool isVerified)
+            : base()
+        {
+            if (string.IsNullOrWhiteSpace(fullName))
+                throw new ArgumentException(
+                    "Full name cannot be empty.",
+                    nameof(fullName));
+
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException(
+                    "Email cannot be empty.",
+                    nameof(email));
+
+            if (string.IsNullOrWhiteSpace(phone))
+                throw new ArgumentException(
+                    "Phone cannot be empty.",
+                    nameof(phone));
+
+            if (string.IsNullOrWhiteSpace(passwordHash))
+                throw new ArgumentException(
+                    "Password hash cannot be empty.",
+                    nameof(passwordHash));
+
+            RoleId = roleId;
+            Province = province;
+            FullName = fullName;
+            Email = email;
+            Phone = phone;
+            DateOfBirth = dateOfBirth;
+            Gender = gender;
+            PasswordHash = passwordHash;
+
+            Status = UserStatus.Active;
+            IsVerified = isVerified;
+        }
 
         // Dùng khi dựng lại User đã tồn tại từ database
         public User(
@@ -48,10 +102,15 @@ namespace RescueHub.Domain.Entities
             bool isVerified,
             DateTime createdAt,
             DateTime? updatedAt,
-            DateTime? deletedAt)
+            DateTime? deletedAt,
+            string? roleName = null,
+            int reliefRequestCount = 0,
+            int donationCount = 0,
+            int taskCompletedCount = 0)
             : base(id, createdAt, updatedAt, deletedAt)
         {
             RoleId = roleId;
+            RoleName = roleName;
             Location = location;
             Province = province;
             ProfileUrl = profileUrl;
@@ -63,6 +122,9 @@ namespace RescueHub.Domain.Entities
             PasswordHash = passwordHash;
             Status = status;
             IsVerified = isVerified;
+            ReliefRequestCount = reliefRequestCount;
+            DonationCount = donationCount;
+            TaskCompletedCount = taskCompletedCount;
         }
 
         // Chỉ cập nhật khi dữ liệu thực sự thay đổi
@@ -119,6 +181,26 @@ namespace RescueHub.Domain.Entities
                 return;
 
             ProfileUrl = profileUrl;
+            MarkUpdated();
+        }
+
+        // Khóa tài khoản User
+        public void LockAccount()
+        {
+            if (Status != UserStatus.Active)
+                return;
+
+            Status = UserStatus.Suspended;
+            MarkUpdated();
+        }
+
+        // Mở khóa tài khoản User
+        public void UnlockAccount()
+        {
+            if (Status != UserStatus.Suspended)
+                return;
+
+            Status = UserStatus.Active;
             MarkUpdated();
         }
     }

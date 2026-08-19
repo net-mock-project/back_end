@@ -1,6 +1,7 @@
 ﻿using RescueHub.Domain.Common.Enums;
 using RescueHub.Domain.Entities;
 using RescueHub.Domain.Interfaces.Users;
+using RescueHub.Domain.Common.Querying;
 
 namespace RescueHub.Domain.Services
 {
@@ -17,7 +18,25 @@ namespace RescueHub.Domain.Services
             Guid userId,
             CancellationToken cancellationToken)
         {
-            return await _userRepository.GetByIdAsync(
+            return await _userRepository.GetProfileByIdAsync(
+                userId,
+                cancellationToken);
+        }
+
+        public async Task<PagedResult<User>> GetUsersAsync(
+            QueryCriteria criteria,
+            CancellationToken cancellationToken)
+        {
+            return await _userRepository.GetPagedAsync(
+                criteria,
+                cancellationToken);
+        }
+
+        public async Task<User?> GetUserDetailAsync(
+            Guid userId,
+            CancellationToken cancellationToken)
+        {
+            return await _userRepository.GetDetailByIdAsync(
                 userId,
                 cancellationToken);
         }
@@ -72,6 +91,118 @@ namespace RescueHub.Domain.Services
             var isUpdated = await _userRepository.UpdateAvatarAsync(
                 user,
                 cancellationToken);
+
+            return isUpdated ? user : null;
+        }
+
+        // Admin tạo User mới
+        public async Task<User> CreateUserAsync(
+            Guid roleId,
+            string? province,
+            string fullName,
+            string email,
+            string phone,
+            DateOnly? dateOfBirth,
+            Gender? gender,
+            string passwordHash,
+            CancellationToken cancellationToken)
+        {
+            // Kiểm tra Role
+            var roleExists = await _userRepository.RoleExistsAsync(
+                roleId,
+                cancellationToken);
+
+            if (!roleExists)
+            {
+                throw new ArgumentException(
+                    "Role does not exist.");
+            }
+
+            // Kiểm tra Email
+            var emailExists = await _userRepository.EmailExistsAsync(
+                email,
+                cancellationToken);
+
+            if (emailExists)
+            {
+                throw new InvalidOperationException(
+                    "Email này đã được sử dụng.");
+            }
+
+            // Kiểm tra Phone
+            var phoneExists = await _userRepository.PhoneExistsAsync(
+                phone,
+                cancellationToken);
+
+            if (phoneExists)
+            {
+                throw new InvalidOperationException(
+                    "Số điện thoại này đã được sử dụng.");
+            }
+
+            // Admin tạo trực tiếp nên User được xác thực
+            var user = new User(
+                roleId,
+                province,
+                fullName,
+                email,
+                phone,
+                dateOfBirth,
+                gender,
+                passwordHash,
+                true);
+
+            await _userRepository.AddAsync(
+                user,
+                cancellationToken);
+
+            return user;
+        }
+
+        // Admin khóa tài khoản User
+        public async Task<User?> LockUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken)
+        {
+            var user = await _userRepository.GetByIdAsync(
+                userId,
+                cancellationToken);
+
+            if (user == null || user.DeletedAt.HasValue)
+            {
+                return null;
+            }
+
+            user.LockAccount();
+
+            var isUpdated =
+                await _userRepository.UpdateStatusAsync(
+                    user,
+                    cancellationToken);
+
+            return isUpdated ? user : null;
+        }
+
+        // Admin mở khóa tài khoản User
+        public async Task<User?> UnlockUserAsync(
+            Guid userId,
+            CancellationToken cancellationToken)
+        {
+            var user = await _userRepository.GetByIdAsync(
+                userId,
+                cancellationToken);
+
+            if (user == null || user.DeletedAt.HasValue)
+            {
+                return null;
+            }
+
+            user.UnlockAccount();
+
+            var isUpdated =
+                await _userRepository.UpdateStatusAsync(
+                    user,
+                    cancellationToken);
 
             return isUpdated ? user : null;
         }
