@@ -118,9 +118,6 @@ public class LockUserCommandValidator
 {
     public LockUserCommandValidator()
     {
-        RuleFor(x => x.PerformedByUserId)
-            .NotEmpty()
-            .WithMessage("PerformedByUserId is required.");
 
         RuleFor(x => x.PerformedByUserId)
             .NotEmpty()

@@ -49,15 +49,6 @@ namespace RescueHub.Domain.Interfaces.Users
             string passwordHash,
             CancellationToken cancellationToken);
 
-        // Admin cập nhật thông tin User
-        Task<User?> UpdateUserAsync(
-            Guid userId,
-            string? fullName,
-            string? phone,
-            DateOnly? dateOfBirth,
-            Gender? gender,
-            CancellationToken cancellationToken);
-
         // Admin khóa tài khoản User
         Task<User?> LockUserAsync(
             Guid userId,

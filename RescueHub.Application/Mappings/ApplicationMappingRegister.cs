@@ -22,7 +22,6 @@ namespace RescueHub.Application.Mappings
             config.NewConfig<UserProfileItem, UserProfileDto>();
             config.NewConfig<UserListItem, UserListDto>();
             config.NewConfig<UserDetailItem, UserDetailDto>();
-            config.NewConfig<User, UpdateUserDto>();
             config.NewConfig<User, UserStatusDto>();
             config.NewConfig<AuditLog, AuditLogDto>();
             config.NewConfig<Notification, NotificationDto>()

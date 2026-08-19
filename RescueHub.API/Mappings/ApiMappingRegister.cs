@@ -27,16 +27,6 @@ namespace RescueHub.API.Mappings
                     request.DateOfBirth,
                     request.Gender));
 
-            config.NewConfig<UpdateUserRequest, UpdateUserCommand>()
-                .MapWith(request => new UpdateUserCommand(
-                    Guid.Empty,
-                    request.FullName,
-                    request.Phone,
-                    request.DateOfBirth,
-                    request.Gender,
-                    Guid.Empty
-                ));
-
             config.NewConfig<SendOtpRequest, SendOtpCommand>()
                 .MapWith(request => new SendOtpCommand(
                     request.FullName,

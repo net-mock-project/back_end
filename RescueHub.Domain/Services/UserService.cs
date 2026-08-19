@@ -71,38 +71,6 @@ namespace RescueHub.Domain.Services
             return user;
         }
 
-        // Admin cập nhật thông tin User
-        public async Task<User?> UpdateUserAsync(
-            Guid userId,
-            string? fullName,
-            string? phone,
-            DateOnly? dateOfBirth,
-            Gender? gender,
-            CancellationToken cancellationToken)
-        {
-            var user = await _userRepository.GetByIdAsync(
-                userId,
-                cancellationToken);
-
-            if (user == null || user.DeletedAt.HasValue)
-            {
-                return null;
-            }
-
-            user.UpdateProfile(
-                fullName,
-                phone,
-                dateOfBirth,
-                gender);
-
-            var isUpdated =
-                await _userRepository.UpdateAsync(
-                    user,
-                    cancellationToken);
-
-            return isUpdated ? user : null;
-        }
-
 
         public async Task<User?> UpdateAvatarAsync(
             Guid userId,

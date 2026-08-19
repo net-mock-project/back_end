@@ -103,43 +103,7 @@ namespace RescueHub.API.Controllers
             return Ok(response);
         }
 
-        // Admin cập nhật thông tin User
-        [HttpPatch("{userId:guid}")]
-        public async Task<IActionResult> UpdateUser(
-             Guid userId,
-             [FromBody] UpdateUserRequest request,
-             CancellationToken cancellationToken)
-        {
-            var adminUserId = GetCurrentUserId();
-
-            if (adminUserId == null)
-            {
-                return Unauthorized();
-            }
-
-            var command =
-                _mapper.Map<UpdateUserCommand>(request)
-                with
-                {
-                    UserId = userId,
-                    PerformedByUserId = adminUserId.Value
-                };
-
-            var result = await _sender.Send(
-                command,
-                cancellationToken);
-
-            if (result == null)
-            {
-                throw new NotFoundException(
-                    $"User '{userId}' not found.");
-            }
-
-            var response =
-                _mapper.Map<UpdateUserResponse>(result);
-
-            return Ok(response);
-        }
+        
 
         // Admin khóa tài khoản User
         [HttpPatch("{userId:guid}/lock")]

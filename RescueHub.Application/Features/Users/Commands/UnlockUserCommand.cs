@@ -45,8 +45,8 @@ public class UnlockUserCommandHandler
         try
         {
             var oldUser = await _userService.GetUserDetailAsync(
-    request.UserId,
-    cancellationToken);
+                request.UserId,
+                cancellationToken);
 
             if (oldUser == null)
             {
@@ -118,6 +118,10 @@ public class UnlockUserCommandValidator
 {
     public UnlockUserCommandValidator()
     {
+        RuleFor(x => x.PerformedByUserId)
+            .NotEmpty()
+            .WithMessage("PerformedByUserId is required.");
+
         RuleFor(x => x.UserId)
             .NotEmpty()
             .WithMessage("UserId is required.");
