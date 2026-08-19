@@ -12,6 +12,13 @@ namespace RescueHub.Domain.Entities
         public Guid? ApprovedBy { get; private set; }
         public DateTime? ApprovedAt { get; private set; }
 
+        // Thông tin đính kèm từ User
+        public string? FullName { get; private set; }
+        public string? Email { get; private set; }
+        public string? Phone { get; private set; }
+        public string? ProfileUrl { get; private set; }
+        public string? Province { get; private set; }
+
         private readonly List<VolunteerSkill> _skills = new();
         public IReadOnlyCollection<VolunteerSkill> Skills => _skills.AsReadOnly();
 
@@ -25,7 +32,12 @@ namespace RescueHub.Domain.Entities
             DateTime createdAt,
             DateTime? updatedAt,
             DateTime? deletedAt,
-            IEnumerable<VolunteerSkill>? skills = null)
+            IEnumerable<VolunteerSkill>? skills = null,
+            string? fullName = null,
+            string? email = null,
+            string? phone = null,
+            string? profileUrl = null,
+            string? province = null)
             : base(id, createdAt, updatedAt, deletedAt)
         {
             ExperienceYears = experienceYears;
@@ -33,6 +45,11 @@ namespace RescueHub.Domain.Entities
             CVUrl = cvUrl;
             ApprovedBy = approvedBy;
             ApprovedAt = approvedAt;
+            FullName = fullName;
+            Email = email;
+            Phone = phone;
+            ProfileUrl = profileUrl;
+            Province = province;
 
             if (skills != null)
             {

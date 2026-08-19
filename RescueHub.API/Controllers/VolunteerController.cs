@@ -67,6 +67,34 @@ namespace RescueHub.API.Controllers
             return Ok(response);
         }
 
+        // Requester cập nhật lại hồ sơ của mình
+        [HttpPut("profile")]
+        [Authorize(Roles = "Requester")]
+        public async Task<IActionResult> UpdateVolunteerProfile(
+            [FromBody] UpdateVolunteerProfileRequest request,
+            CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+
+            var command = _mapper.Map<UpdateVolunteerProfileCommand>(request) with
+            {
+                UserId = userId.Value
+            };
+
+            var result = await _sender.Send(command, cancellationToken);
+            if (result == null)
+            {
+                throw new NotFoundException("Volunteer profile was not found.");
+            }
+
+            var response = _mapper.Map<VolunteerProfileResponse>(result);
+            return Ok(response);
+        }
+
         // Lấy hồ sơ Volunteer của User hiện tại
         [HttpGet("profile")]
         [Authorize(Roles = "Requester")]
@@ -113,6 +141,43 @@ namespace RescueHub.API.Controllers
                 cancellationToken);
 
             return Ok(result);
+        }
+
+        // Coordinator lấy danh sách Volunteer chính thức đã được duyệt
+        [HttpGet]
+        [Authorize(Roles = "Coordinator")]
+        public async Task<IActionResult> GetApprovedVolunteerProfiles(
+            [FromQuery] VolunteerQueryRequest request,
+            CancellationToken cancellationToken)
+        {
+            var queryRequest = _mapper.Map<QueryRequest>(request);
+            var criteria = _mapper.Map<QueryCriteria>(queryRequest);
+
+            var result = await _sender.Send(
+                new GetApprovedVolunteerProfilesQuery(criteria),
+                cancellationToken);
+
+            return Ok(result);
+        }
+
+        // Coordinator xem chi tiết một hồ sơ Volunteer
+        [HttpGet("{id:guid}")]
+        [Authorize(Roles = "Coordinator")]
+        public async Task<IActionResult> GetVolunteerProfileById(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            var result = await _sender.Send(
+                new GetVolunteerProfileByIdQuery(id),
+                cancellationToken);
+
+            if (result == null)
+            {
+                throw new NotFoundException($"Volunteer profile with ID '{id}' was not found.");
+            }
+
+            var response = _mapper.Map<VolunteerProfileResponse>(result);
+            return Ok(response);
         }
 
         // Coordinator duyệt hồ sơ Volunteer

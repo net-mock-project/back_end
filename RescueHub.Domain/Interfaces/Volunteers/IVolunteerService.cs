@@ -18,6 +18,13 @@ namespace RescueHub.Domain.Interfaces.Volunteers
             IEnumerable<(Guid SkillId, int Level)> skills,
             CancellationToken cancellationToken);
 
+        Task<Volunteer?> UpdateProfileAsync(
+            Guid volunteerId,
+            int experienceYears,
+            string? cvUrl,
+            IEnumerable<(Guid SkillId, int Level)> skills,
+            CancellationToken cancellationToken);
+
         Task<PagedResult<Volunteer>> GetPendingProfilesAsync(
             QueryCriteria criteria,
             CancellationToken cancellationToken);
@@ -30,6 +37,10 @@ namespace RescueHub.Domain.Interfaces.Volunteers
         Task<Volunteer?> RejectProfileAsync(
             Guid volunteerId,
             Guid approverId,
+            CancellationToken cancellationToken);
+
+        Task<PagedResult<Volunteer>> GetApprovedProfilesAsync(
+            QueryCriteria criteria,
             CancellationToken cancellationToken);
     }
 }

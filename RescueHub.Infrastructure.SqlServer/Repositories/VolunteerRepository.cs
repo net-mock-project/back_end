@@ -23,6 +23,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
         {
             var dataModel = await _dbContext.Volunteers
                 .AsNoTracking()
+                .Include(v => v.User)
                 .Include(v => v.VolunteerSkills)
                     .ThenInclude(vs => vs.Skill)
                 .FirstOrDefaultAsync(v => v.Id == volunteerId, cancellationToken);
@@ -61,6 +62,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             CancellationToken cancellationToken)
         {
             var dataModel = await _dbContext.Volunteers
+                .Include(v => v.VolunteerSkills)
                 .FirstOrDefaultAsync(v => v.Id == volunteer.VolunteerId, cancellationToken);
 
             if (dataModel != null)
@@ -72,6 +74,14 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 dataModel.ApprovedAt = volunteer.ApprovedAt;
                 dataModel.UpdatedAt = volunteer.UpdatedAt;
                 dataModel.DeletedAt = volunteer.DeletedAt;
+
+                _dbContext.VolunteerSkills.RemoveRange(dataModel.VolunteerSkills);
+                dataModel.VolunteerSkills = volunteer.Skills.Select(s => new VolunteerSkillDataModel
+                {
+                    VolunteerId = volunteer.VolunteerId,
+                    SkillId = s.SkillId,
+                    Level = s.Level
+                }).ToList();
             }
         }
 
@@ -92,6 +102,38 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             var dataModels = await query
                 .Skip((criteria.PageNumber - 1) * criteria.PageSize)
                 .Take(criteria.PageSize)
+                .Include(v => v.User)
+                .Include(v => v.VolunteerSkills)
+                    .ThenInclude(vs => vs.Skill)
+                .ToListAsync(cancellationToken);
+
+            var items = dataModels
+                .Select(MapToDomain)
+                .Where(x => x != null)
+                .Select(x => x!)
+                .ToList();
+
+            return new PagedResult<Volunteer>(items, totalCount);
+        }
+
+        public async Task<PagedResult<Volunteer>> GetApprovedPagedAsync(
+            QueryCriteria criteria,
+            CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Volunteers
+                .AsNoTracking()
+                .Where(x => x.ApprovalStatus == VolunteerApprovalStatus.Approved && x.DeletedAt == null);
+
+            query = ApplySearch(query, criteria.Search);
+            query = ApplyFilters(query, criteria.Filters);
+            query = ApplySorting(query, criteria.SortBy, criteria.SortDirection);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var dataModels = await query
+                .Skip((criteria.PageNumber - 1) * criteria.PageSize)
+                .Take(criteria.PageSize)
+                .Include(v => v.User)
                 .Include(v => v.VolunteerSkills)
                     .ThenInclude(vs => vs.Skill)
                 .ToListAsync(cancellationToken);
@@ -115,6 +157,8 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             search = search.Trim();
 
             return query.Where(x =>
+                (x.User != null && x.User.FullName.Contains(search)) ||
+                (x.User != null && x.User.Email.Contains(search)) ||
                 (x.CVUrl != null && x.CVUrl.Contains(search)));
         }
 
@@ -132,6 +176,18 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                     query = ApplyIntFilter(query, filter, x => x.ExperienceYears);
                 else if (field.Equals("createdAt", StringComparison.OrdinalIgnoreCase))
                     query = ApplyDateTimeFilter(query, filter, x => x.CreatedAt);
+                else if (field.Equals("province", StringComparison.OrdinalIgnoreCase))
+                {
+                    var provinceVal = filter.Value?.Trim() ?? string.Empty;
+                    query = query.Where(x => x.User != null && x.User.Province != null && x.User.Province.Contains(provinceVal));
+                }
+                else if (field.Equals("skillId", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (Guid.TryParse(filter.Value, out var skillId))
+                    {
+                        query = query.Where(x => x.VolunteerSkills.Any(s => s.SkillId == skillId));
+                    }
+                }
             }
 
             return query;
@@ -262,7 +318,12 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 dataModel.CreatedAt,
                 dataModel.UpdatedAt,
                 dataModel.DeletedAt,
-                skills);
+                skills,
+                fullName: dataModel.User?.FullName,
+                email: dataModel.User?.Email,
+                phone: dataModel.User?.Phone,
+                profileUrl: dataModel.User?.ProfileUrl,
+                province: dataModel.User?.Province);
         }
     }
 }

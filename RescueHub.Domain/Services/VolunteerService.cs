@@ -58,6 +58,42 @@ namespace RescueHub.Domain.Services
             return volunteer;
         }
 
+        public async Task<Volunteer?> UpdateProfileAsync(
+            Guid volunteerId,
+            int experienceYears,
+            string? cvUrl,
+            IEnumerable<(Guid SkillId, int Level)> skills,
+            CancellationToken cancellationToken)
+        {
+            var volunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
+            if (volunteer == null)
+                return null;
+
+            var volunteerSkills = skills.Select(s =>
+                new VolunteerSkill(volunteerId, s.SkillId, s.Level)
+            ).ToList();
+
+            var updatedVolunteer = new Volunteer(
+                volunteer.VolunteerId,
+                experienceYears,
+                volunteer.ApprovalStatus,
+                cvUrl,
+                volunteer.ApprovedBy,
+                volunteer.ApprovedAt,
+                volunteer.CreatedAt,
+                DateTime.UtcNow,
+                volunteer.DeletedAt,
+                volunteerSkills,
+                volunteer.FullName,
+                volunteer.Email,
+                volunteer.Phone,
+                volunteer.ProfileUrl,
+                volunteer.Province);
+
+            await _volunteerRepository.UpdateAsync(updatedVolunteer, cancellationToken);
+            return updatedVolunteer;
+        }
+
         public Task<PagedResult<Volunteer>> GetPendingProfilesAsync(
             QueryCriteria criteria,
             CancellationToken cancellationToken)
@@ -123,6 +159,15 @@ namespace RescueHub.Domain.Services
 
             await _volunteerRepository.UpdateAsync(updatedVolunteer, cancellationToken);
             return updatedVolunteer;
+        }
+
+        public Task<PagedResult<Volunteer>> GetApprovedProfilesAsync(
+            QueryCriteria criteria,
+            CancellationToken cancellationToken)
+        {
+            return _volunteerRepository.GetApprovedPagedAsync(
+                criteria,
+                cancellationToken);
         }
     }
 }

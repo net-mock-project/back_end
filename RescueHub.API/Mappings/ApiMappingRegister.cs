@@ -121,6 +121,16 @@ namespace RescueHub.API.Mappings
                         .ToList()
                 ));
 
+            config.NewConfig<UpdateVolunteerProfileRequest, UpdateVolunteerProfileCommand>()
+                .MapWith(request => new UpdateVolunteerProfileCommand(
+                    Guid.Empty,
+                    request.ExperienceYears,
+                    request.CVUrl,
+                    request.Skills
+                        .Select(s => new VolunteerSkillInput(s.SkillId, s.Level))
+                        .ToList()
+                ));
+
             config.NewConfig<AuditLogQueryRequest, QueryRequest>();
             config.NewConfig<NotificationQueryRequest, QueryRequest>();
             config.NewConfig<VolunteerQueryRequest, QueryRequest>();

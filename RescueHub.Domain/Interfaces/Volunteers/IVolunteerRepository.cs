@@ -20,5 +20,9 @@ namespace RescueHub.Domain.Interfaces.Volunteers
         Task<PagedResult<Volunteer>> GetPendingPagedAsync(
             QueryCriteria criteria,
             CancellationToken cancellationToken);
+
+        Task<PagedResult<Volunteer>> GetApprovedPagedAsync(
+            QueryCriteria criteria,
+            CancellationToken cancellationToken);
     }
 }
