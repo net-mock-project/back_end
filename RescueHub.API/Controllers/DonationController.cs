@@ -136,6 +136,64 @@ namespace RescueHub.API.Controllers
             return Ok(new { message = "Đã hủy đơn quyên góp thành công." });
         }
 
+        [Authorize(Roles = "Coordinator")]
+        [HttpGet("donations/coordinator")]
+        public async Task<IActionResult> GetAllDonations(CancellationToken cancellationToken)
+        {
+            var coordinatorId = GetCurrentUserId();
+            if (coordinatorId == null) return Unauthorized();
+
+            var query = new GetAllDonationsQuery(coordinatorId.Value);
+            var result = await _sender.Send(query, cancellationToken);
+
+            if (result == null)
+            {
+                throw new NotFoundException($"Donations for coordinatorId '{coordinatorId}' not found.");
+            }
+
+            var response = _mapper.Map<List<GetMyDonationResponse>>(result);
+
+            return Ok(response);
+        }
+
+        // 2. Xác nhận đồ đã đến kho (Chuyển Pending -> completed)
+        [Authorize(Roles = "Coordinator")]
+        [HttpPatch("donations/{donationId:Guid}/accept")]
+        public async Task<IActionResult> ConfirmCompleted(Guid donationId, CancellationToken cancellationToken)
+        {
+            var coordinatorId = GetCurrentUserId();
+            if (coordinatorId == null) return Unauthorized();
+
+            var command = new ConfirmDonationReceivedCommand(donationId, coordinatorId.Value);
+            var success = await _sender.Send(command, cancellationToken);
+
+            if (!success)
+            {
+                throw new NotFoundException($"Donation '{donationId}' not found or cannot be updated.");
+            }
+
+            return Ok(new { message = "Đã xác nhận nhận đồ thành công, trạng thái chuyển sang Received." });
+        }
+
+        [Authorize(Roles = "Coordinator")]
+        [HttpPatch("donations/{donationId:Guid}/reject")]
+        public async Task<IActionResult> ConfirmRejected(Guid donationId, CancellationToken cancellationToken)
+        {
+            var coordinatorId = GetCurrentUserId();
+            if (coordinatorId == null) return Unauthorized();
+
+            var command = new ConfirmDonationRejectedCommand(donationId, coordinatorId.Value);
+            var success = await _sender.Send(command, cancellationToken);
+
+            if (!success)
+            {
+                throw new NotFoundException($"Donation '{donationId}' not found or cannot be updated.");
+            }
+
+            return Ok(new { message = "Đã xác nhận từ chối quyên góp thành công." });
+        }
+
+
         // Lấy UserId từ token đăng nhập
         private Guid? GetCurrentUserId()
         {
