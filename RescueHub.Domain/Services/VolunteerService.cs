@@ -1,5 +1,6 @@
 ﻿using RescueHub.Domain.Common.Constants;
 using RescueHub.Domain.Common.Enums;
+using RescueHub.Domain.Common.Querying;
 using RescueHub.Domain.Entities;
 using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Domain.Interfaces.Volunteers;
@@ -55,6 +56,15 @@ namespace RescueHub.Domain.Services
 
             await _volunteerRepository.AddAsync(volunteer, cancellationToken);
             return volunteer;
+        }
+
+        public Task<PagedResult<Volunteer>> GetPendingProfilesAsync(
+            QueryCriteria criteria,
+            CancellationToken cancellationToken)
+        {
+            return _volunteerRepository.GetPendingPagedAsync(
+                criteria,
+                cancellationToken);
         }
 
         public async Task<Volunteer?> ApproveProfileAsync(

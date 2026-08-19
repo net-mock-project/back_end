@@ -123,6 +123,7 @@ namespace RescueHub.API.Mappings
 
             config.NewConfig<AuditLogQueryRequest, QueryRequest>();
             config.NewConfig<NotificationQueryRequest, QueryRequest>();
+            config.NewConfig<VolunteerQueryRequest, QueryRequest>();
 
             // DTO -> Response
             config.NewConfig<UserProfileDto, UserProfileResponse>();

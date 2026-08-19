@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RescueHub.API.Models.Volunteers;
 using RescueHub.Application.Common.Exceptions;
+using RescueHub.Application.Contracts.Querying;
 using RescueHub.Application.Features.Volunteers.Commands;
 using RescueHub.Application.Features.Volunteers.Queries;
+using RescueHub.Domain.Common.Querying;
 using System.Security.Claims;
 
 namespace RescueHub.API.Controllers
@@ -95,6 +97,22 @@ namespace RescueHub.API.Controllers
                 _mapper.Map<VolunteerProfileResponse>(result);
 
             return Ok(response);
+        }
+
+        [HttpGet("pending")]
+        [Authorize(Roles = "Coordinator")]
+        public async Task<IActionResult> GetPendingVolunteerProfiles(
+            [FromQuery] VolunteerQueryRequest request,
+            CancellationToken cancellationToken)
+        {
+            var queryRequest = _mapper.Map<QueryRequest>(request);
+            var criteria = _mapper.Map<QueryCriteria>(queryRequest);
+
+            var result = await _sender.Send(
+                new GetPendingVolunteerProfilesQuery(criteria),
+                cancellationToken);
+
+            return Ok(result);
         }
 
         // Coordinator duyệt hồ sơ Volunteer

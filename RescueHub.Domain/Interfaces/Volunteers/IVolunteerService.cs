@@ -1,4 +1,5 @@
-﻿using RescueHub.Domain.Entities;
+﻿using RescueHub.Domain.Common.Querying;
+using RescueHub.Domain.Entities;
 
 namespace RescueHub.Domain.Interfaces.Volunteers
 {
@@ -15,6 +16,10 @@ namespace RescueHub.Domain.Interfaces.Volunteers
             int experienceYears,
             string? cvUrl,
             IEnumerable<(Guid SkillId, int Level)> skills,
+            CancellationToken cancellationToken);
+
+        Task<PagedResult<Volunteer>> GetPendingProfilesAsync(
+            QueryCriteria criteria,
             CancellationToken cancellationToken);
 
         Task<Volunteer?> ApproveProfileAsync(

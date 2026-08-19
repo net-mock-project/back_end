@@ -1,4 +1,5 @@
-﻿using RescueHub.Domain.Entities;
+﻿using RescueHub.Domain.Common.Querying;
+using RescueHub.Domain.Entities;
 
 namespace RescueHub.Domain.Interfaces.Volunteers
 {
@@ -14,6 +15,10 @@ namespace RescueHub.Domain.Interfaces.Volunteers
 
         Task UpdateAsync(
             Volunteer volunteer,
+            CancellationToken cancellationToken);
+
+        Task<PagedResult<Volunteer>> GetPendingPagedAsync(
+            QueryCriteria criteria,
             CancellationToken cancellationToken);
     }
 }

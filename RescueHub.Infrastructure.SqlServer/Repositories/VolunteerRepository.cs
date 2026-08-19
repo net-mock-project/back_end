@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RescueHub.Domain.Common.Enums;
+using RescueHub.Domain.Common.Querying;
 using RescueHub.Domain.Entities;
 using RescueHub.Domain.Interfaces.Volunteers;
 using RescueHub.Infrastructure.SqlServer.Models;
@@ -71,6 +73,170 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 dataModel.UpdatedAt = volunteer.UpdatedAt;
                 dataModel.DeletedAt = volunteer.DeletedAt;
             }
+        }
+
+        public async Task<PagedResult<Volunteer>> GetPendingPagedAsync(
+            QueryCriteria criteria,
+            CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Volunteers
+                .AsNoTracking()
+                .Where(x => x.ApprovalStatus == VolunteerApprovalStatus.Pending && x.DeletedAt == null);
+
+            query = ApplySearch(query, criteria.Search);
+            query = ApplyFilters(query, criteria.Filters);
+            query = ApplySorting(query, criteria.SortBy, criteria.SortDirection);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var dataModels = await query
+                .Skip((criteria.PageNumber - 1) * criteria.PageSize)
+                .Take(criteria.PageSize)
+                .Include(v => v.VolunteerSkills)
+                    .ThenInclude(vs => vs.Skill)
+                .ToListAsync(cancellationToken);
+
+            var items = dataModels
+                .Select(MapToDomain)
+                .Where(x => x != null)
+                .Select(x => x!)
+                .ToList();
+
+            return new PagedResult<Volunteer>(items, totalCount);
+        }
+
+        private static IQueryable<VolunteerDataModel> ApplySearch(
+            IQueryable<VolunteerDataModel> query,
+            string? search)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+                return query;
+
+            search = search.Trim();
+
+            return query.Where(x =>
+                (x.CVUrl != null && x.CVUrl.Contains(search)));
+        }
+
+        private static IQueryable<VolunteerDataModel> ApplyFilters(
+            IQueryable<VolunteerDataModel> query,
+            IReadOnlyList<FilterCriteria> filters)
+        {
+            foreach (var filter in filters)
+            {
+                var field = filter.Field.Trim();
+
+                if (field.Equals("id", StringComparison.OrdinalIgnoreCase))
+                    query = ApplyGuidFilter(query, filter, x => x.Id);
+                else if (field.Equals("experienceYears", StringComparison.OrdinalIgnoreCase))
+                    query = ApplyIntFilter(query, filter, x => x.ExperienceYears);
+                else if (field.Equals("createdAt", StringComparison.OrdinalIgnoreCase))
+                    query = ApplyDateTimeFilter(query, filter, x => x.CreatedAt);
+            }
+
+            return query;
+        }
+
+        private static IQueryable<VolunteerDataModel> ApplyGuidFilter(
+            IQueryable<VolunteerDataModel> query,
+            FilterCriteria filter,
+            System.Linq.Expressions.Expression<Func<VolunteerDataModel, Guid>> selector)
+        {
+            if (!Guid.TryParse(filter.Value, out var value))
+                return query.Where(_ => false);
+
+            var parameter = selector.Parameters[0];
+            var property = selector.Body;
+            var constant = System.Linq.Expressions.Expression.Constant(value);
+            var body = filter.Operator switch
+            {
+                FilterOperator.Equals => System.Linq.Expressions.Expression.Equal(property, constant),
+                FilterOperator.NotEquals => System.Linq.Expressions.Expression.NotEqual(property, constant),
+                _ => null!
+            };
+
+            if (body == null) return query.Where(_ => false);
+
+            return query.Where(System.Linq.Expressions.Expression.Lambda<Func<VolunteerDataModel, bool>>(body, parameter));
+        }
+
+        private static IQueryable<VolunteerDataModel> ApplyIntFilter(
+            IQueryable<VolunteerDataModel> query,
+            FilterCriteria filter,
+            System.Linq.Expressions.Expression<Func<VolunteerDataModel, int>> selector)
+        {
+            if (!int.TryParse(filter.Value, out var value))
+                return query.Where(_ => false);
+
+            var parameter = selector.Parameters[0];
+            var property = selector.Body;
+            var constant = System.Linq.Expressions.Expression.Constant(value);
+
+            var body = filter.Operator switch
+            {
+                FilterOperator.Equals => System.Linq.Expressions.Expression.Equal(property, constant),
+                FilterOperator.NotEquals => System.Linq.Expressions.Expression.NotEqual(property, constant),
+                FilterOperator.GreaterThan => System.Linq.Expressions.Expression.GreaterThan(property, constant),
+                FilterOperator.GreaterThanOrEqual => System.Linq.Expressions.Expression.GreaterThanOrEqual(property, constant),
+                FilterOperator.LessThan => System.Linq.Expressions.Expression.LessThan(property, constant),
+                FilterOperator.LessThanOrEqual => System.Linq.Expressions.Expression.LessThanOrEqual(property, constant),
+                _ => null
+            };
+
+            if (body == null) return query.Where(_ => false);
+
+            return query.Where(System.Linq.Expressions.Expression.Lambda<Func<VolunteerDataModel, bool>>(body, parameter));
+        }
+
+        private static IQueryable<VolunteerDataModel> ApplyDateTimeFilter(
+            IQueryable<VolunteerDataModel> query,
+            FilterCriteria filter,
+            System.Linq.Expressions.Expression<Func<VolunteerDataModel, DateTime>> selector)
+        {
+            if (!DateTime.TryParse(filter.Value, out var value))
+                return query.Where(_ => false);
+
+            var parameter = selector.Parameters[0];
+            var property = selector.Body;
+            var constant = System.Linq.Expressions.Expression.Constant(value);
+
+            var body = filter.Operator switch
+            {
+                FilterOperator.Equals => System.Linq.Expressions.Expression.Equal(property, constant),
+                FilterOperator.NotEquals => System.Linq.Expressions.Expression.NotEqual(property, constant),
+                FilterOperator.GreaterThan => System.Linq.Expressions.Expression.GreaterThan(property, constant),
+                FilterOperator.GreaterThanOrEqual => System.Linq.Expressions.Expression.GreaterThanOrEqual(property, constant),
+                FilterOperator.LessThan => System.Linq.Expressions.Expression.LessThan(property, constant),
+                FilterOperator.LessThanOrEqual => System.Linq.Expressions.Expression.LessThanOrEqual(property, constant),
+                _ => null
+            };
+
+            if (body == null) return query.Where(_ => false);
+
+            return query.Where(System.Linq.Expressions.Expression.Lambda<Func<VolunteerDataModel, bool>>(body, parameter));
+        }
+
+        private static IQueryable<VolunteerDataModel> ApplySorting(
+            IQueryable<VolunteerDataModel> query,
+            string? sortBy,
+            SortDirection sortDirection)
+        {
+            var field = sortBy?.Trim();
+
+            if (string.IsNullOrWhiteSpace(field))
+                return query.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id);
+
+            var descending = sortDirection == SortDirection.Desc;
+
+            return field.ToLowerInvariant() switch
+            {
+                "id" => descending ? query.OrderByDescending(x => x.Id) : query.OrderBy(x => x.Id),
+                "experienceyears" => descending ? query.OrderByDescending(x => x.ExperienceYears) : query.OrderBy(x => x.ExperienceYears),
+                "createdat" => descending
+                    ? query.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id)
+                    : query.OrderBy(x => x.CreatedAt).ThenBy(x => x.Id),
+                _ => query.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => x.Id)
+            };
         }
 
         private Volunteer? MapToDomain(VolunteerDataModel? dataModel)
