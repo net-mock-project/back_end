@@ -50,6 +50,20 @@ namespace RescueHub.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("supplies")]
+        public async Task<IActionResult> GetMySupply(CancellationToken cancellationToken)
+        {
+            var result = await _sender.Send(new GetMySupplyQuery(), cancellationToken);
+
+            if (result == null || !result.Any())
+            {
+                
+                throw new NotFoundException("Supplies are not found.");
+            }
+
+            return Ok(result); 
+        }
+
         // Tạo donation mới
         [HttpPost("donations")]
         public async Task<IActionResult> CreateDonation(
