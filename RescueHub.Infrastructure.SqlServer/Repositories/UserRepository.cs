@@ -5,6 +5,7 @@ using RescueHub.Domain.Interfaces.Users;
 using RescueHub.Infrastructure.SqlServer.Models;
 using RescueHub.Infrastructure.SqlServer.Persistence;
 using RescueHub.Domain.Common.Querying;
+using NetTopologySuite.Geometries;
 
 namespace RescueHub.Infrastructure.SqlServer.Repositories
 {
@@ -322,6 +323,37 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             return true;
         }
 
+        public async Task<bool> UpdateLocationAsync(
+            User user,
+            CancellationToken cancellationToken)
+        {
+            // Khóa row User trong transaction hiện tại
+            var existing = await _dbContext.Users
+                .FromSqlInterpolated($@"
+                SELECT *
+                FROM [Users] WITH (UPDLOCK, ROWLOCK)
+                WHERE Id = {user.Id}")
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (existing == null ||
+                user.Location == null)
+            {
+                return false;
+            }
+
+            existing.Location = new Point(
+                user.Location.Longitude,
+                user.Location.Latitude)
+            {
+                SRID = 4326
+            };
+
+            existing.UpdatedAt =
+                user.UpdatedAt;
+
+            return true;
+        }
+
         // Chuyển Data Model sang Domain Entity
         private User? MapToDomain(
             UserDataModel? dataModel,
@@ -366,5 +398,7 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 donationCount,
                 taskCompletedCount);
         }
+
+        
     }
 }
