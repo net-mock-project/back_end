@@ -18,6 +18,8 @@ namespace RescueHub.API.Models.Users
 
         public string? Province { get; set; }
 
+        public string? ProfileUrl { get; set; }
+
         public UserStatus Status { get; set; }
 
         public bool IsVerified { get; set; }

@@ -57,5 +57,12 @@ namespace RescueHub.Domain.Interfaces.Users
         Task<User?> UnlockUserAsync(
             Guid userId,
             CancellationToken cancellationToken);
+
+        // Cập nhật vị trí hiện tại của User
+        Task<User?> UpdateLocationAsync(
+            Guid userId,
+            double latitude,
+            double longitude,
+            CancellationToken cancellationToken);
     }
 }

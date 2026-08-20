@@ -4,6 +4,7 @@ using RescueHub.Application;
 using RescueHub.Infrastructure.SqlServer;
 using RescueHub.Infrastructure.SqlServer.Seeds;
 using System.Text.Json.Serialization;
+using RescueHub.API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,8 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddPresentation();
+
+builder.Services.AddSignalR();
 
 // Application
 builder.Services.AddApplication();
@@ -71,5 +74,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<LocationHub>("/hubs/location");
 
 app.Run();
