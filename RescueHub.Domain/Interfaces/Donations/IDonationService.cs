@@ -19,10 +19,12 @@ namespace RescueHub.Domain.Interfaces.Donations
 
         Task<bool> CancelDonationAsync(Guid userId, Guid donationId, CancellationToken cancellationToken);
         Task<List<Donation>> GetDonationsByUserIdAsync(Guid userId, CancellationToken cancellationToken);
+        Task<List<string>> GetSuppliesNameAsync(CancellationToken cancellationToken);
 
         // Coordinator
         Task<bool> ConfirmDonationReceivedAsync(Guid donationId, Guid coordinatorId, CancellationToken cancellationToken);
         Task<bool> ConfirmDonationRejectedAsync(Guid donationId, Guid coordinatorId, CancellationToken cancellationToken);
         Task<List<Donation>> GetAllDonationsAsync(Guid coordinatorId, CancellationToken cancellationToken);
+
     }
 }
