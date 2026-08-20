@@ -5,17 +5,19 @@ using RescueHub.API.Models.Notifications;
 using RescueHub.API.Models.Users;
 using RescueHub.API.Models.Donation;
 using RescueHub.API.Models.Volunteers;
+using RescueHub.API.Models.ReliefRequests;
 using RescueHub.Application.Contracts.AuditLogs;
 using RescueHub.Application.Contracts.Notifications;
 using RescueHub.Application.Contracts.Querying;
 using RescueHub.Application.Contracts.Users;
 using RescueHub.Application.Contracts.Donation;
 using RescueHub.Application.Contracts.Volunteers;
+using RescueHub.Application.Contracts.ReliefRequests;
 using RescueHub.Application.Features.Auth.Commands;
 using RescueHub.Application.Features.Users.Commands;
 using RescueHub.Application.Features.Donations.Commands;
 using RescueHub.Application.Features.Volunteers.Commands;
-using RescueHub.Application.Contracts.Querying;
+using RescueHub.Application.Features.ReliefRequests.Commands;
 
 namespace RescueHub.API.Mappings
 {
@@ -147,6 +149,60 @@ namespace RescueHub.API.Mappings
             config.NewConfig<AuditLogQueryRequest, QueryRequest>();
             config.NewConfig<NotificationQueryRequest, QueryRequest>();
             config.NewConfig<VolunteerQueryRequest, QueryRequest>();
+
+            // ReliefRequests: Request -> Command
+            config.NewConfig<CreateReliefRequestApiRequest, CreateReliefRequestCommand>()
+                .MapWith(src => new CreateReliefRequestCommand(
+                    Guid.Empty,
+                    src.Longitude,
+                    src.Latitude,
+                    src.Title,
+                    src.Description,
+                    src.ReliefImageUrl,
+                    src.RequestedResource,
+                    src.UrgencyLevel,
+                    src.EstimatedAffectedPeople,
+                    src.EstimatedAffectedRadiusKm
+                ));
+
+            config.NewConfig<UpdateReliefRequestApiRequest, UpdateReliefRequestCommand>()
+                .MapWith(src => new UpdateReliefRequestCommand(
+                    Guid.Empty,
+                    Guid.Empty,
+                    false,
+                    src.Longitude,
+                    src.Latitude,
+                    src.Title,
+                    src.Description,
+                    src.ReliefImageUrl,
+                    src.RequestedResource,
+                    src.UrgencyLevel,
+                    src.EstimatedAffectedPeople,
+                    src.EstimatedAffectedRadiusKm
+                ));
+
+            // ReliefRequests: DTO -> Response
+            config.NewConfig<ReliefRequestDto, ReliefRequestResponse>()
+                .MapWith(src => new ReliefRequestResponse
+                {
+                    Id = src.Id,
+                    RequesterId = src.RequesterId,
+                    CoordinatorId = src.CoordinatorId,
+                    Longitude = src.Longitude,
+                    Latitude = src.Latitude,
+                    Title = src.Title,
+                    Description = src.Description,
+                    ReliefImageUrl = src.ReliefImageUrl,
+                    RequestedResource = src.RequestedResource,
+                    StartTime = src.StartTime,
+                    EndTime = src.EndTime,
+                    UrgencyLevel = src.UrgencyLevel,
+                    EstimatedAffectedPeople = src.EstimatedAffectedPeople,
+                    EstimatedAffectedRadiusKm = src.EstimatedAffectedRadiusKm,
+                    Status = src.Status,
+                    CompletedAt = src.CompletedAt,
+                    CreatedAt = src.CreatedAt
+                });
 
             // DTO -> Response
             config.NewConfig<UserProfileDto, UserProfileResponse>();

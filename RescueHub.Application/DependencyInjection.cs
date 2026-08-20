@@ -43,6 +43,7 @@ namespace RescueHub.Application
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IDonationService, DonationService>();
             services.AddScoped<IVolunteerService, VolunteerService>();
+            services.AddScoped<RescueHub.Domain.Interfaces.ReliefRequests.IReliefRequestService, ReliefRequestService>();
 
             return services;
         }

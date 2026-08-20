@@ -8,6 +8,8 @@ using RescueHub.Domain.Common.Querying;
 using RescueHub.Domain.Entities;
 using RescueHub.Application.Contracts.Donation;
 
+using RescueHub.Application.Contracts.ReliefRequests;
+
 namespace RescueHub.Application.Mappings
 {
     public class ApplicationMappingRegister : IRegister
@@ -76,6 +78,10 @@ namespace RescueHub.Application.Mappings
                 // 6. Lấy thông tin Donor
                 .Map(dest => dest.DonatorName, src => src.Donator != null ? src.Donator.FullName : string.Empty)
                 .Map(dest => dest.DonatorPhone, src => src.Donator != null ? src.Donator.Phone : string.Empty);
+
+            config.NewConfig<ReliefRequest, ReliefRequestDto>()
+                .Map(dest => dest.Longitude, src => src.Location != null ? src.Location.Longitude : 0)
+                .Map(dest => dest.Latitude, src => src.Location != null ? src.Location.Latitude : 0);
         }
     }
 }
