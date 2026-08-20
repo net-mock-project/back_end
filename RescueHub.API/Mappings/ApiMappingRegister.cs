@@ -18,6 +18,8 @@ using RescueHub.Application.Features.Users.Commands;
 using RescueHub.Application.Features.Donations.Commands;
 using RescueHub.Application.Features.Volunteers.Commands;
 using RescueHub.Application.Features.ReliefRequests.Commands;
+using RescueHub.Application.Features.ReliefTasks.Commands;
+using RescueHub.Application.Contracts.ReliefTasks;
 
 namespace RescueHub.API.Mappings
 {
@@ -203,6 +205,14 @@ namespace RescueHub.API.Mappings
                     CompletedAt = src.CompletedAt,
                     CreatedAt = src.CreatedAt
                 });
+
+            // ReliefTasks: Request -> Command
+            config.NewConfig<RescueHub.API.Models.ReliefTasks.CreateReliefTaskApiRequest, CreateReliefTaskCommand>();
+            config.NewConfig<RescueHub.API.Models.ReliefTasks.UpdateReliefTaskApiRequest, UpdateReliefTaskCommand>();
+
+            // ReliefTasks: DTO -> Response
+            config.NewConfig<ReliefTaskDto, RescueHub.API.Models.ReliefTasks.ReliefTaskResponse>();
+            config.NewConfig<RescueHub.Application.Contracts.TaskAssignments.TaskAssignmentDto, RescueHub.API.Models.ReliefTasks.TaskAssignmentResponse>();
 
             // DTO -> Response
             config.NewConfig<UserProfileDto, UserProfileResponse>();
