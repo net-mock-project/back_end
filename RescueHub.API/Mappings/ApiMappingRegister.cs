@@ -102,7 +102,7 @@ namespace RescueHub.API.Mappings
 
             config.NewConfig<CreateUserRequest, CreateUserCommand>()
                 .MapWith(request => new CreateUserCommand(
-                    request.RoleId,
+                    request.RoleName,
                     request.Province,
                     request.FullName,
                     request.Email,
