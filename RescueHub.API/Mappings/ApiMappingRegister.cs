@@ -3,13 +3,15 @@ using RescueHub.API.Models.AuditLogs;
 using RescueHub.API.Models.Auth;
 using RescueHub.API.Models.Notifications;
 using RescueHub.API.Models.Users;
+using RescueHub.API.Models.Donation;
 using RescueHub.Application.Contracts.AuditLogs;
 using RescueHub.Application.Contracts.Notifications;
 using RescueHub.Application.Contracts.Querying;
 using RescueHub.Application.Contracts.Users;
+using RescueHub.Application.Contracts.Donation;
 using RescueHub.Application.Features.Auth.Commands;
 using RescueHub.Application.Features.Users.Commands;
-using RescueHub.Application.Contracts.Querying;
+using RescueHub.Application.Features.Donations.Commands;
 
 namespace RescueHub.API.Mappings
 {
@@ -28,32 +30,60 @@ namespace RescueHub.API.Mappings
                     request.Gender));
 
             config.NewConfig<SendOtpRequest, SendOtpCommand>()
-                .MapWith(request => new SendOtpCommand(
-                    request.FullName,
-                    request.DateOfBirth,
-                    request.Email,
-                    request.Phone,
-                    request.Gender,
-                    request.Password,
-                    request.Address
+                .MapWith(src => new SendOtpCommand(
+                    src.FullName,
+                    src.DateOfBirth,
+                    src.Email,
+                    src.Phone,
+                    src.Gender,
+                    src.Password,
+                    src.Address
+                ));
+
+            config.NewConfig<UpdateDonationRequest, UpdateDonationCommand>()
+                .MapWith(src => new UpdateDonationCommand(
+                    Guid.Empty,
+                    Guid.Empty,
+                    src.Items != null
+                        ? src.Items.Select(i => i == null ? null : new RescueHub.Application.Contracts.Donation.DonationItemRequest
+                        {
+                            SupplyName = i.SupplyName,
+                            Quantity = i.Quantity,
+                            Unit = i.Unit
+                        }).ToList()
+                        : null,
+                    src.DonationDate
+                ));
+
+            config.NewConfig<CreateDonationRequest, CreateDonationCommand>()
+                .MapWith(src => new CreateDonationCommand(
+                    Guid.Empty,
+                    src.Items != null
+                        ? src.Items.Select(i => i == null ? null : new RescueHub.Application.Contracts.Donation.DonationItemRequest
+                        {
+                            SupplyName = i.SupplyName,
+                            Quantity = i.Quantity,
+                            Unit = i.Unit
+                        }).ToList()!
+                        : new List<RescueHub.Application.Contracts.Donation.DonationItemRequest>(),
+                    src.DonationDate
                 ));
 
             config.NewConfig<ResendOtpRequest, ResendOtpCommand>()
-                .MapWith(request => new ResendOtpCommand(
-                    request.Email
+                .MapWith(src => new ResendOtpCommand(
+                    src.Email
                 ));
 
             config.NewConfig<RegisterRequest, RegisterCommand>()
-                .MapWith(request => new RegisterCommand(
-                    request.Email,
-                    request.OtpCode
+                .MapWith(src => new RegisterCommand(
+                    src.Email,
+                    src.OtpCode
                 ));
 
-
             config.NewConfig<LoginRequest, LoginCommand>()
-                .MapWith(request => new LoginCommand(
-                    request.Email,
-                    request.Password
+                .MapWith(src => new LoginCommand(
+                    src.Email,
+                    src.Password
                 ));
 
             config.NewConfig<GetUsersRequest, QueryRequest>()
@@ -92,7 +122,7 @@ namespace RescueHub.API.Mappings
             config.NewConfig<UserStatusDto, UserStatusResponse>();
             config.NewConfig<AuditLogDto, AuditLogResponse>();
             config.NewConfig<NotificationDto, NotificationResponse>();
+            config.NewConfig<DonationDto, GetMyDonationResponse>();
         }
     }
-
 }

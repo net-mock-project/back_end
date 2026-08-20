@@ -37,6 +37,8 @@ namespace RescueHub.Domain.Entities
 
         public int TaskCompletedCount { get; private set; }
 
+        public ICollection<Donation> Donations { get; set; } = new List<Donation>();
+
         private User() { }
 
         // Dùng khi tạo mới User
@@ -85,7 +87,7 @@ namespace RescueHub.Domain.Entities
             IsVerified = isVerified;
         }
 
-        // Dùng khi dựng lại User đã tồn tại từ database
+        // Dùng khi dựng lại User đã tồn từ database
         public User(
             Guid id,
             Guid roleId,
@@ -169,7 +171,7 @@ namespace RescueHub.Domain.Entities
                 MarkUpdated();
         }
 
-        // Cập nhật avartar của user
+        // Cập nhật avatar của user
         public void UpdateAvatar(string profileUrl)
         {
             if (string.IsNullOrWhiteSpace(profileUrl))

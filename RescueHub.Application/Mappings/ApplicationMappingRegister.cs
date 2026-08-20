@@ -5,6 +5,7 @@ using RescueHub.Application.Contracts.Querying;
 using RescueHub.Application.Contracts.Users;
 using RescueHub.Domain.Common.Querying;
 using RescueHub.Domain.Entities;
+using RescueHub.Application.Contracts.Donation;
 
 namespace RescueHub.Application.Mappings
 {
@@ -22,8 +23,52 @@ namespace RescueHub.Application.Mappings
             config.NewConfig<User, UserDetailDto>();
             config.NewConfig<User, UserStatusDto>();
             config.NewConfig<AuditLog, AuditLogDto>();
+
             config.NewConfig<Notification, NotificationDto>()
                 .Map(dest => dest.Type, src => src.Type.ToString());
+
+            config.NewConfig<Donation, DonationDto>()
+                // 1. Map Id sang DonationId
+                .Map(dest => dest.DonationId, src => src.Id)
+
+                // 2. Map DonationDate từ Entity sang DTO
+                .Map(dest => dest.DonationDate, src => src.DonationDate)
+
+                // 3. Map Status
+                .Map(dest => dest.Status, src => src.Status)
+
+                // 4. Lấy tên Kho (Warehouse Name) từ giao dịch đầu tiên
+                .Map(dest => dest.WarehouseName, src => src.DonationTransactions
+                    .FirstOrDefault() != null
+                    && src.DonationTransactions.FirstOrDefault()!.WarehouseTransactions != null
+                    && src.DonationTransactions.FirstOrDefault()!.WarehouseTransactions!.WarehouseInventories != null
+                    && src.DonationTransactions.FirstOrDefault()!.WarehouseTransactions!.WarehouseInventories!.Warehouses != null
+                        ? src.DonationTransactions.FirstOrDefault()!.WarehouseTransactions!.WarehouseInventories!.Warehouses!.Name
+                        : string.Empty)
+
+                // 5. Map danh sách các vật phẩm (Items) từ các transaction liên quan
+                .Map(dest => dest.Items, src => src.DonationTransactions.Select(dt => new DonationItemRequest
+                {
+                    SupplyName = dt.WarehouseTransactions != null
+                                 && dt.WarehouseTransactions.WarehouseInventories != null
+                                 && dt.WarehouseTransactions.WarehouseInventories.Supplys != null
+                        ? dt.WarehouseTransactions.WarehouseInventories.Supplys.Name
+                        : string.Empty,
+
+                    Quantity = dt.WarehouseTransactions != null
+                        ? dt.WarehouseTransactions.Quantity
+                        : 0,
+
+                    Unit = dt.WarehouseTransactions != null
+                           && dt.WarehouseTransactions.WarehouseInventories != null
+                           && dt.WarehouseTransactions.WarehouseInventories.Supplys != null
+                        ? dt.WarehouseTransactions.WarehouseInventories.Supplys.Unit
+                        : string.Empty
+                }).ToList())
+
+                // 6. Lấy thông tin Donor
+                .Map(dest => dest.DonatorName, src => src.Donator != null ? src.Donator.FullName : string.Empty)
+                .Map(dest => dest.DonatorPhone, src => src.Donator != null ? src.Donator.Phone : string.Empty);
         }
     }
 }
