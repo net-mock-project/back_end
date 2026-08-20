@@ -206,5 +206,36 @@ namespace RescueHub.Domain.Services
 
             return isUpdated ? user : null;
         }
+
+
+        public async Task<User?> UpdateLocationAsync(
+            Guid userId,
+            double latitude,
+            double longitude,
+            CancellationToken cancellationToken)
+        {
+            var user = await _userRepository.GetByIdAsync(
+                userId,
+                cancellationToken);
+
+            if (user == null ||
+                user.DeletedAt.HasValue)
+            {
+                return null;
+            }
+
+            user.UpdateLocation(
+                latitude,
+                longitude);
+
+            var isUpdated =
+                await _userRepository.UpdateLocationAsync(
+                    user,
+                    cancellationToken);
+
+            return isUpdated
+                ? user
+                : null;
+        }
     }
 }
