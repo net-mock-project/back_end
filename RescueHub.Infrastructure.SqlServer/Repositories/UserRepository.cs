@@ -298,6 +298,30 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             return true;
         }
 
+        // Cập nhật Role của User khi được phê duyệt hoặc thay đổi quyền
+        public async Task<bool> UpdateRoleAsync(
+            User user,
+            CancellationToken cancellationToken)
+        {
+            // Khóa row User trong transaction hiện tại
+            var existing = await _dbContext.Users
+                .FromSqlInterpolated($@"
+                    SELECT *
+                    FROM [Users] WITH (UPDLOCK, ROWLOCK)
+                    WHERE Id = {user.Id}")
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (existing == null)
+            {
+                return false;
+            }
+
+            existing.RoleId = user.RoleId;
+            existing.UpdatedAt = user.UpdatedAt;
+
+            return true;
+        }
+
         // Chuyển Data Model sang Domain Entity
         private User? MapToDomain(
             UserDataModel? dataModel,

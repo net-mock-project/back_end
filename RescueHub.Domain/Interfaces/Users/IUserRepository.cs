@@ -55,5 +55,10 @@ namespace RescueHub.Domain.Interfaces.Users
         Task<bool> UpdateStatusAsync(
             User user,
             CancellationToken cancellationToken);
+
+        // Cập nhật Role của User
+        Task<bool> UpdateRoleAsync(
+            User user,
+            CancellationToken cancellationToken);
     }
 }
