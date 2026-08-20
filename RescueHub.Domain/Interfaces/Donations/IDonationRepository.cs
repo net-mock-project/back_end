@@ -16,6 +16,7 @@ namespace RescueHub.Domain.Interfaces.Donations
 
         Task<Donation?> GetDonationByIdAndUserIdAsync(Guid donationId, Guid userId, CancellationToken cancellationToken);
         Task<List<Donation>> GetDonationsByUserIdAsync(Guid userId, CancellationToken cancellationToken);
+        Task<List<Supply>> GetAllSuppliesAsync(CancellationToken cancellationToken);
 
         Task<WarehouseInventory?> GetWarehouseInventoryByIdAsync(Guid warehouseInventoryId, CancellationToken cancellationToken);
         Task<WarehouseTransaction?> GetTransactionByIdAsync(Guid transactionId, CancellationToken cancellationToken);

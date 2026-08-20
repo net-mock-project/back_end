@@ -17,6 +17,22 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
             _context = context;
         }
 
+        public async Task<List<Supply>> GetAllSuppliesAsync(CancellationToken cancellationToken)
+        {
+            var models = await _context.Supplies
+                .ToListAsync(cancellationToken);
+            return models.Select(s => new Supply(
+                s.Id,
+                s.Name,
+                s.Category ?? string.Empty,
+                s.Unit,
+                s.MinimumStock,
+                s.CreatedAt,
+                s.UpdatedAt,
+                null
+            )).ToList();
+        }
+
         public async Task<User?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
         {
             var model = await _context.Users

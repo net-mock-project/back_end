@@ -247,6 +247,12 @@ namespace RescueHub.Domain.Services
             return await _donationRepository.GetDonationByIdAndUserIdAsync(donationId, userId, cancellationToken);
         }
 
+        public async Task<List<string>> GetSuppliesNameAsync(CancellationToken cancellationToken) 
+        {
+            var supplies = await _donationRepository.GetAllSuppliesAsync(cancellationToken);
+            return supplies.Select(s => s.Name).ToList();
+        }
+
         public async Task<bool> CancelDonationAsync(Guid userId, Guid donationId, CancellationToken cancellationToken)
         {
             var donation = await _donationRepository.GetDonationWithTrackingAsync(donationId, cancellationToken);
