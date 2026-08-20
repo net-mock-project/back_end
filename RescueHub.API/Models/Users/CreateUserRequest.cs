@@ -4,7 +4,7 @@ namespace RescueHub.API.Models.Users
 {
     public class CreateUserRequest
     {
-        public Guid RoleId { get; set; }
+        public string RoleName { get; set; } = null!;
 
         public string? Province { get; set; }
 
