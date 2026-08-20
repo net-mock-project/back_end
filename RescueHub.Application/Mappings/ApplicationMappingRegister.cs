@@ -82,6 +82,13 @@ namespace RescueHub.Application.Mappings
             config.NewConfig<ReliefRequest, ReliefRequestDto>()
                 .Map(dest => dest.Longitude, src => src.Location != null ? src.Location.Longitude : 0)
                 .Map(dest => dest.Latitude, src => src.Location != null ? src.Location.Latitude : 0);
+
+            config.NewConfig<ReliefTask, RescueHub.Application.Contracts.ReliefTasks.ReliefTaskDto>()
+                .Map(dest => dest.Latitude, src => src.Location != null ? src.Location.Latitude : (double?)null)
+                .Map(dest => dest.Longitude, src => src.Location != null ? src.Location.Longitude : (double?)null);
+
+            config.NewConfig<TaskAssignment, RescueHub.Application.Contracts.TaskAssignments.TaskAssignmentDto>();
+            config.NewConfig<VolunteerEngagement, RescueHub.Application.Contracts.VolunteerEngagements.VolunteerEngagementDto>();
         }
     }
 }
