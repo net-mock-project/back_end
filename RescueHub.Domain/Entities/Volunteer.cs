@@ -6,6 +6,7 @@ namespace RescueHub.Domain.Entities
     public class Volunteer : BaseEntity
     {
         public Guid VolunteerId => Id;
+        public GeoLocation? Location { get; private set; }
         public int ExperienceYears { get; private set; }
         public VolunteerApprovalStatus ApprovalStatus { get; private set; }
         public string? CVUrl { get; private set; }
@@ -37,7 +38,8 @@ namespace RescueHub.Domain.Entities
             string? email = null,
             string? phone = null,
             string? profileUrl = null,
-            string? province = null)
+            string? province = null,
+            Common.Enums.GeoLocation? location = null)
             : base(id, createdAt, updatedAt, deletedAt)
         {
             ExperienceYears = experienceYears;
@@ -50,6 +52,7 @@ namespace RescueHub.Domain.Entities
             Phone = phone;
             ProfileUrl = profileUrl;
             Province = province;
+            Location = location;
 
             if (skills != null)
             {
