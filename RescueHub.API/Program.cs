@@ -1,5 +1,6 @@
 using RescueHub.API;
 using RescueHub.API.Common;
+using RescueHub.API.hub;
 using RescueHub.Application;
 using RescueHub.Infrastructure.SqlServer;
 using RescueHub.Infrastructure.SqlServer.Seeds;
@@ -37,6 +38,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+
+
+builder.Services.AddSignalR();
+
+
+
 // Build Application
 var app = builder.Build();
 
@@ -71,5 +78,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<LocationHub>("/hub/location");
 
 app.Run();

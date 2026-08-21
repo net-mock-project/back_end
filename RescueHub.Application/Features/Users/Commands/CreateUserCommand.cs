@@ -7,11 +7,12 @@ using RescueHub.Application.Contracts.Users;
 using RescueHub.Domain.Entities;
 using RescueHub.Domain.Interfaces.AuditLogs;
 using System.Text.Json;
+using RescueHub.Domain.Interfaces.Roles;
 
 namespace RescueHub.Application.Features.Users.Commands
 {
     public record CreateUserCommand(
-        Guid RoleId,
+        string RoleName,
         string? Province,
         string FullName,
         string Email,
@@ -30,24 +31,36 @@ namespace RescueHub.Application.Features.Users.Commands
         private readonly IPasswordHasher _passwordHasher;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAuditLogService _auditLogService;
+        private readonly IRoleRepository _roleRepository;
 
         public CreateUserCommandHandler(
             IUserService userService,
             IPasswordHasher passwordHasher,
             IUnitOfWork unitOfWork,
-            IAuditLogService auditLogService)
+            IAuditLogService auditLogService,
+            IRoleRepository roleRepository)
         {
             _userService = userService;
             _passwordHasher = passwordHasher;
             _unitOfWork = unitOfWork;
             _auditLogService = auditLogService;
+            _roleRepository = roleRepository;
         }
 
         public async Task<CreateUserDto> Handle(
-            CreateUserCommand request,
-            CancellationToken cancellationToken)
+    CreateUserCommand request,
+    CancellationToken cancellationToken)
         {
-            // Hash mật khẩu trước khi lưu DB
+            var role = await _roleRepository.GetByNameAsync(
+                request.RoleName.Trim(),
+                cancellationToken);
+
+            if (role == null)
+            {
+                throw new ArgumentException(
+                    $"Role '{request.RoleName}' does not exist.");
+            }
+
             var passwordHash =
                 _passwordHasher.Hash(request.Password);
 
@@ -57,7 +70,7 @@ namespace RescueHub.Application.Features.Users.Commands
             try
             {
                 var user = await _userService.CreateUserAsync(
-                    request.RoleId,
+                    role.RoleId,
                     request.Province,
                     request.FullName,
                     request.Email,
@@ -67,7 +80,6 @@ namespace RescueHub.Application.Features.Users.Commands
                     passwordHash,
                     cancellationToken);
 
-                // Ghi AuditLog tạo User
                 var newValue = JsonSerializer.Serialize(new
                 {
                     roleId = user.RoleId,
@@ -124,9 +136,12 @@ namespace RescueHub.Application.Features.Users.Commands
                 .NotEmpty()
                 .WithMessage("PerformedByUserId is required.");
 
-            RuleFor(x => x.RoleId)
+            RuleFor(x => x.RoleName)
                 .NotEmpty()
-                .WithMessage("Role is required.");
+                .WithMessage("Role is required.")
+                .MaximumLength(50)
+                .WithMessage(
+                    "Role name must not exceed 50 characters.");
 
             RuleFor(x => x.FullName)
                 .NotEmpty()

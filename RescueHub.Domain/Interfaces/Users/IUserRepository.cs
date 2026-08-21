@@ -60,5 +60,10 @@ namespace RescueHub.Domain.Interfaces.Users
         Task<bool> UpdateRoleAsync(
             User user,
             CancellationToken cancellationToken);
+
+
+        Task<bool> UpdateLocationAsync(
+            User user,
+            CancellationToken cancellationToken);
     }
 }

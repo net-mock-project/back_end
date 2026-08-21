@@ -1,4 +1,4 @@
-﻿using RescueHub.Domain.Common.Querying;
+using RescueHub.Domain.Common.Querying;
 using RescueHub.Domain.Entities;
 
 namespace RescueHub.Domain.Interfaces.Volunteers
@@ -16,6 +16,10 @@ namespace RescueHub.Domain.Interfaces.Volunteers
 
         Task<PagedResult<Volunteer>> GetApprovedPagedAsync(
             string province,
+            QueryCriteria criteria,
+            CancellationToken cancellationToken);
+
+        Task<PagedResult<Volunteer>> GetApprovedPagedAsync(
             QueryCriteria criteria,
             CancellationToken cancellationToken);
 

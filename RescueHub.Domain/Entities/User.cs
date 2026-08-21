@@ -220,5 +220,24 @@ namespace RescueHub.Domain.Entities
             Status = UserStatus.Active;
             MarkUpdated();
         }
+
+        public void UpdateLocation(
+            double latitude,
+            double longitude)
+        {
+            if (
+                Location != null &&
+                Location.Latitude == latitude &&
+                Location.Longitude == longitude)
+            {
+                return;
+            }
+
+            Location = new GeoLocation(
+                latitude,
+                longitude);
+
+            MarkUpdated();
+        }
     }
 }

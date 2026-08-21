@@ -351,6 +351,16 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                     vs.Skill?.Name)
             ).ToList();
 
+            
+            GeoLocation? location = null;
+
+            if (dataModel.User?.Location != null)
+            {
+                location = new GeoLocation(
+                    dataModel.User.Location.Y,
+                    dataModel.User.Location.X);
+            }
+
             return new Volunteer(
                 dataModel.Id,
                 dataModel.ExperienceYears,
@@ -366,7 +376,8 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 email: dataModel.User?.Email,
                 phone: dataModel.User?.Phone,
                 profileUrl: dataModel.User?.ProfileUrl,
-                province: dataModel.User?.Province);
+                province: dataModel.User?.Province,
+                location: location);
         }
     }
 }

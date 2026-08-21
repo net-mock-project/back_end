@@ -55,6 +55,9 @@ namespace RescueHub.Infrastructure.SqlServer
             // Đăng ký Donation Repository
             services.AddScoped<IDonationRepository, DonationRepository>();
             services.AddScoped<RescueHub.Domain.Interfaces.ReliefRequests.IReliefRequestRepository, ReliefRequestRepository>();
+            services.AddScoped<RescueHub.Domain.Interfaces.IReliefTaskRepository, ReliefTaskRepository>();
+            services.AddScoped<RescueHub.Domain.Interfaces.ITaskAssignmentRepository, TaskAssignmentRepository>();
+            services.AddScoped<RescueHub.Domain.Interfaces.IVolunteerEngagementRepository, VolunteerEngagementRepository>();
 
             // Đăng ký Unit Of Work
             services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -69,7 +69,7 @@ namespace RescueHub.API.Controllers
             var result = await _sender.Send(query, cancellationToken);
 
             if (result == null)
-                throw new NotFoundException($"Volunteer profile for User '{userId}' not found.");
+                return Ok(null);
 
             var response = _mapper.Map<VolunteerProfileResponse>(result);
             return Ok(response);
@@ -142,7 +142,6 @@ namespace RescueHub.API.Controllers
 
         [HttpGet("api/coordinator/volunteers")]
         [Tags("Coordinator - Volunteers")]
-        [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> GetApprovedVolunteerProfiles(
             [FromQuery] VolunteerQueryRequest request,
             CancellationToken cancellationToken)

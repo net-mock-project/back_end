@@ -178,5 +178,31 @@ namespace RescueHub.API.Controllers
             await _sender.Send(new CoordinatorActionReliefRequestCommand(requestId, userId.Value, "export"), cancellationToken);
             return Ok(ApiResponse.Success(new { message = "Đã xuất yêu cầu cứu trợ thành công." }));
         }
+        [HttpPost("{id}/availability")]
+        [Authorize]
+        public async Task<IActionResult> RegisterAvailability(Guid id, CancellationToken cancellationToken)
+        {
+            var volunteerIdStr = User.FindFirst("id")?.Value;
+            if (string.IsNullOrEmpty(volunteerIdStr) || !Guid.TryParse(volunteerIdStr, out var volunteerId))
+                return Unauthorized();
+
+            var command = new RescueHub.Application.Features.VolunteerEngagements.Commands.RegisterAvailabilityCommand(volunteerId, id);
+            var result = await _sender.Send(command, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}/availability")]
+        [Authorize]
+        public async Task<IActionResult> CancelAvailability(Guid id, CancellationToken cancellationToken)
+        {
+            var volunteerIdStr = User.FindFirst("id")?.Value;
+            if (string.IsNullOrEmpty(volunteerIdStr) || !Guid.TryParse(volunteerIdStr, out var volunteerId))
+                return Unauthorized();
+
+            var command = new RescueHub.Application.Features.VolunteerEngagements.Commands.CancelAvailabilityCommand(volunteerId, id);
+            var result = await _sender.Send(command, cancellationToken);
+            if (!result) return NotFound();
+            return NoContent();
+        }
     }
 }

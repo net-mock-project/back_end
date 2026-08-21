@@ -1,4 +1,4 @@
-﻿using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries;
 
 namespace RescueHub.Infrastructure.SqlServer.Seeds
 {
@@ -36,6 +36,16 @@ namespace RescueHub.Infrastructure.SqlServer.Seeds
             Guid.Parse("20000000-0000-0000-0000-000000000004");
         public static readonly Guid VolunteerUser4 =
             Guid.Parse("20000000-0000-0000-0000-000000000005");
+        public static readonly Guid VolunteerUser5 = Guid.Parse("20000000-0000-0000-0000-000000000009");
+        public static readonly Guid VolunteerUser6 = Guid.Parse("20000000-0000-0000-0000-000000000010");
+        public static readonly Guid VolunteerUser7 = Guid.Parse("20000000-0000-0000-0000-000000000011");
+        public static readonly Guid VolunteerUser8 = Guid.Parse("20000000-0000-0000-0000-000000000012");
+        public static readonly Guid VolunteerUser9 = Guid.Parse("20000000-0000-0000-0000-000000000013");
+        public static readonly Guid VolunteerUser10 = Guid.Parse("20000000-0000-0000-0000-000000000014");
+        public static readonly Guid VolunteerUser11 = Guid.Parse("20000000-0000-0000-0000-000000000015");
+        public static readonly Guid VolunteerUser12 = Guid.Parse("20000000-0000-0000-0000-000000000016");
+        public static readonly Guid VolunteerUser13 = Guid.Parse("20000000-0000-0000-0000-000000000017");
+        public static readonly Guid VolunteerUser14 = Guid.Parse("20000000-0000-0000-0000-000000000018");
         public static readonly Guid CoordinatorUser =
             Guid.Parse("20000000-0000-0000-0000-000000000006");
         public static readonly Guid AdminUser =
@@ -70,6 +80,16 @@ namespace RescueHub.Infrastructure.SqlServer.Seeds
             VolunteerUser3;
         public static readonly Guid Volunteer4 =
             VolunteerUser4;
+        public static readonly Guid Volunteer5 = VolunteerUser5;
+        public static readonly Guid Volunteer6 = VolunteerUser6;
+        public static readonly Guid Volunteer7 = VolunteerUser7;
+        public static readonly Guid Volunteer8 = VolunteerUser8;
+        public static readonly Guid Volunteer9 = VolunteerUser9;
+        public static readonly Guid Volunteer10 = VolunteerUser10;
+        public static readonly Guid Volunteer11 = VolunteerUser11;
+        public static readonly Guid Volunteer12 = VolunteerUser12;
+        public static readonly Guid Volunteer13 = VolunteerUser13;
+        public static readonly Guid Volunteer14 = VolunteerUser14;
 
         // Relief Requests
         public static readonly Guid Request1 =
