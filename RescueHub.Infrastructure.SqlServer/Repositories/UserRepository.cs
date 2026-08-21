@@ -399,6 +399,36 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
                 taskCompletedCount);
         }
 
-        
+        public async Task<List<User>> GetUsersWithinRangeAsync(
+            double latitude,
+            double longitude,
+            double radius,
+            CancellationToken cancellationToken)
+        {
+            var point = new Point(longitude, latitude)
+            {
+                SRID = 4326
+            };
+
+            var data = await _dbContext.Users
+                .AsNoTracking()
+                .Where(u =>
+                    u.DeletedAt == null &&
+                    u.Location != null &&
+                    u.Location.Distance(point) <= radius)
+                .Select(u => new
+                {
+                    User = u,
+                    RoleName = u.Role.Name
+                })
+                .ToListAsync(cancellationToken);
+
+            return data
+                .Select(x =>
+                    MapToDomain(
+                        x.User,
+                        x.RoleName)!)
+                .ToList();
+        }
     }
 }

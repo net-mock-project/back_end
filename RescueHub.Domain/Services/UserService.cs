@@ -237,5 +237,18 @@ namespace RescueHub.Domain.Services
                 ? user
                 : null;
         }
+
+        public async Task<List<User>> GetUsersWithinRangeAsync(
+            double latitude,
+            double longitude,
+            double radius,
+            CancellationToken cancellationToken)
+        {
+            return await _userRepository.GetUsersWithinRangeAsync(
+                latitude,
+                longitude,
+                radius,
+                cancellationToken);
+        }
     }
 }

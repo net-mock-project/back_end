@@ -2,10 +2,12 @@ using Mapster;
 using MediatR;
 using RescueHub.Application.Common.Interfaces;
 using RescueHub.Application.Contracts.ReliefRequests;
+using RescueHub.Domain.Common.Enums;
 using RescueHub.Domain.Entities;
 using RescueHub.Domain.Interfaces.AuditLogs;
 using RescueHub.Domain.Interfaces.Notifications;
 using RescueHub.Domain.Interfaces.ReliefRequests;
+using RescueHub.Domain.Interfaces.Users;
 using System.Text.Json;
 
 namespace RescueHub.Application.Features.ReliefRequests.Commands
@@ -26,7 +28,7 @@ namespace RescueHub.Application.Features.ReliefRequests.Commands
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IReliefRequestService _service;
-
+        private readonly IUserService _userService;
         private readonly IAuditLogService _auditLogService;
         private readonly INotificationService _notificationService;
 
@@ -34,12 +36,14 @@ namespace RescueHub.Application.Features.ReliefRequests.Commands
             IUnitOfWork unitOfWork, 
             IReliefRequestService service,
             IAuditLogService auditLogService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _service = service;
             _auditLogService = auditLogService;
             _notificationService = notificationService;
+            _userService = userService;
         }
 
         public async Task<ReliefRequestDto> Handle(CreateReliefRequestCommand request, CancellationToken cancellationToken)
@@ -79,6 +83,33 @@ namespace RescueHub.Application.Features.ReliefRequests.Commands
                             entity.EstimatedAffectedRadiusKm
                         })),
                     cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                if (request.EstimatedAffectedRadiusKm.HasValue)
+                {
+                    var affectedUsers =
+                        await _userService.GetUsersWithinRangeAsync(
+                            request.Latitude,
+                            request.Longitude,
+                            (double)request.EstimatedAffectedRadiusKm.Value * 1000,
+                            cancellationToken);
+
+                    foreach (var user in affectedUsers)
+                    {
+                        var notification = new Notification(
+                            user.Id,
+                            "New Relief Request",
+                            $"A new relief request has been created: {entity.Title}",
+                            NotificationType.ReliefRequest,
+                            $"/relief-requests/{entity.Id}"
+                        );
+
+                        await _notificationService.CreateAsync(
+                            notification,
+                            cancellationToken);
+                    }
+                }
+
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 await _unitOfWork.CommitAsync(cancellationToken);
