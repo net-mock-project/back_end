@@ -207,6 +207,9 @@ namespace RescueHub.Domain.Entities
             if (Status != UserStatus.Active)
                 return;
 
+            if (RoleId == Guid.Parse("10000000-0000-0000-0000-000000000004"))
+                return;
+
             Status = UserStatus.Suspended;
             MarkUpdated();
         }

@@ -64,5 +64,11 @@ namespace RescueHub.Domain.Interfaces.Users
             double latitude,
             double longitude,
             CancellationToken cancellationToken);
+
+        Task<List<User>> GetUsersWithinRangeAsync(
+            double latitude,
+            double longitude,
+            double radius,
+            CancellationToken cancellationToken);
     }
 }
