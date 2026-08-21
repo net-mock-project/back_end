@@ -1,4 +1,4 @@
-﻿using RescueHub.Domain.Common.Enums;
+using RescueHub.Domain.Common.Enums;
 using RescueHub.Infrastructure.SqlServer.Models;
 
 namespace RescueHub.Infrastructure.SqlServer.Seeds
@@ -315,6 +315,176 @@ namespace RescueHub.Infrastructure.SqlServer.Seeds
 
                 new()
                 {
+                    Id = SeedConstants.VolunteerUser5,
+                    RoleId = SeedConstants.VolunteerRole,
+                    Gender = Gender.Male,
+                    DateOfBirth = new DateOnly(1995, 2, 10),
+                    Location = SeedLocation.Create(105.8342, 21.0278),
+                    Province = "Hà Nội",
+                    FullName = "Nguyễn Hữu Trí",
+                    Email = "volunteer5@rescuehub.test",
+                    Phone = "0900000009",
+                    PasswordHash = SeedPasswordHash,
+                    Status = UserStatus.Active,
+                    IsVerified = true,
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.VolunteerUser6,
+                    RoleId = SeedConstants.VolunteerRole,
+                    Gender = Gender.Female,
+                    DateOfBirth = new DateOnly(1999, 6, 15),
+                    Location = SeedLocation.Create(106.6297, 10.8231),
+                    Province = "Hồ Chí Minh",
+                    FullName = "Trần Thị Ánh",
+                    Email = "volunteer6@rescuehub.test",
+                    Phone = "0900000010",
+                    PasswordHash = SeedPasswordHash,
+                    Status = UserStatus.Active,
+                    IsVerified = true,
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.VolunteerUser7,
+                    RoleId = SeedConstants.VolunteerRole,
+                    Gender = Gender.Male,
+                    DateOfBirth = new DateOnly(1988, 11, 22),
+                    Location = SeedLocation.Create(107.5905, 16.4637),
+                    Province = "Thừa Thiên Huế",
+                    FullName = "Lê Quang Đại",
+                    Email = "volunteer7@rescuehub.test",
+                    Phone = "0900000011",
+                    PasswordHash = SeedPasswordHash,
+                    Status = UserStatus.Active,
+                    IsVerified = true,
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.VolunteerUser8,
+                    RoleId = SeedConstants.VolunteerRole,
+                    Gender = Gender.Female,
+                    DateOfBirth = new DateOnly(2001, 4, 8),
+                    Location = SeedLocation.Create(105.1500, 10.0333),
+                    Province = "Cần Thơ",
+                    FullName = "Phạm Thị Bình",
+                    Email = "volunteer8@rescuehub.test",
+                    Phone = "0900000012",
+                    PasswordHash = SeedPasswordHash,
+                    Status = UserStatus.Active,
+                    IsVerified = true,
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.VolunteerUser9,
+                    RoleId = SeedConstants.VolunteerRole,
+                    Gender = Gender.Male,
+                    DateOfBirth = new DateOnly(1993, 7, 30),
+                    Location = SeedLocation.Create(106.1833, 20.4167),
+                    Province = "Nam Định",
+                    FullName = "Hoàng Văn Tuấn",
+                    Email = "volunteer9@rescuehub.test",
+                    Phone = "0900000013",
+                    PasswordHash = SeedPasswordHash,
+                    Status = UserStatus.Active,
+                    IsVerified = true,
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.VolunteerUser10,
+                    RoleId = SeedConstants.VolunteerRole,
+                    Gender = Gender.Female,
+                    DateOfBirth = new DateOnly(1997, 12, 5),
+                    Location = SeedLocation.Create(107.0833, 11.4167),
+                    Province = "Bình Phước",
+                    FullName = "Bùi Thu Thủy",
+                    Email = "volunteer10@rescuehub.test",
+                    Phone = "0900000014",
+                    PasswordHash = SeedPasswordHash,
+                    Status = UserStatus.Active,
+                    IsVerified = true,
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.VolunteerUser11,
+                    RoleId = SeedConstants.VolunteerRole,
+                    Gender = Gender.Male,
+                    DateOfBirth = new DateOnly(1990, 9, 18),
+                    Location = SeedLocation.Create(106.6667, 10.9667),
+                    Province = "Bình Dương",
+                    FullName = "Đặng Quang Huy",
+                    Email = "volunteer11@rescuehub.test",
+                    Phone = "0900000015",
+                    PasswordHash = SeedPasswordHash,
+                    Status = UserStatus.Active,
+                    IsVerified = true,
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.VolunteerUser12,
+                    RoleId = SeedConstants.VolunteerRole,
+                    Gender = Gender.Female,
+                    DateOfBirth = new DateOnly(2002, 3, 12),
+                    Location = SeedLocation.Create(108.9833, 11.5833),
+                    Province = "Ninh Thuận",
+                    FullName = "Nguyễn Ngọc Dung",
+                    Email = "volunteer12@rescuehub.test",
+                    Phone = "0900000016",
+                    PasswordHash = SeedPasswordHash,
+                    Status = UserStatus.Active,
+                    IsVerified = true,
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.VolunteerUser13,
+                    RoleId = SeedConstants.VolunteerRole,
+                    Gender = Gender.Male,
+                    DateOfBirth = new DateOnly(1985, 1, 28),
+                    Location = SeedLocation.Create(106.3333, 20.9500),
+                    Province = "Hải Dương",
+                    FullName = "Vũ Tiến Dũng",
+                    Email = "volunteer13@rescuehub.test",
+                    Phone = "0900000017",
+                    PasswordHash = SeedPasswordHash,
+                    Status = UserStatus.Active,
+                    IsVerified = true,
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.VolunteerUser14,
+                    RoleId = SeedConstants.VolunteerRole,
+                    Gender = Gender.Female,
+                    DateOfBirth = new DateOnly(1996, 10, 10),
+                    Location = SeedLocation.Create(105.7167, 21.0167),
+                    Province = "Hà Nội",
+                    FullName = "Lý Kim Chi",
+                    Email = "volunteer14@rescuehub.test",
+                    Phone = "0900000018",
+                    PasswordHash = SeedPasswordHash,
+                    Status = UserStatus.Active,
+                    IsVerified = true,
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
                     Id = SeedConstants.CoordinatorUser,
                     RoleId = SeedConstants.CoordinatorRole,
                     Gender = Gender.Male,
@@ -412,6 +582,116 @@ namespace RescueHub.Infrastructure.SqlServer.Seeds
                     ApprovedBy = null,
                     ApprovedAt = null,
                     CreatedAt = SeedDate.AddDays(5)
+                },
+
+                new()
+                {
+                    Id = SeedConstants.Volunteer5,
+                    ExperienceYears = 4,
+                    ApprovalStatus = VolunteerApprovalStatus.Approved,
+                    CVUrl = "https://example.com/cv/volunteer-5",
+                    ApprovedBy = SeedConstants.CoordinatorUser,
+                    ApprovedAt = SeedDate.AddDays(4),
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.Volunteer6,
+                    ExperienceYears = 2,
+                    ApprovalStatus = VolunteerApprovalStatus.Approved,
+                    CVUrl = "https://example.com/cv/volunteer-6",
+                    ApprovedBy = SeedConstants.CoordinatorUser,
+                    ApprovedAt = SeedDate.AddDays(6),
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.Volunteer7,
+                    ExperienceYears = 8,
+                    ApprovalStatus = VolunteerApprovalStatus.Approved,
+                    CVUrl = "https://example.com/cv/volunteer-7",
+                    ApprovedBy = SeedConstants.CoordinatorUser,
+                    ApprovedAt = SeedDate.AddDays(2),
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.Volunteer8,
+                    ExperienceYears = 1,
+                    ApprovalStatus = VolunteerApprovalStatus.Pending,
+                    CVUrl = "https://example.com/cv/volunteer-8",
+                    ApprovedBy = null,
+                    ApprovedAt = null,
+                    CreatedAt = SeedDate.AddDays(10)
+                },
+
+                new()
+                {
+                    Id = SeedConstants.Volunteer9,
+                    ExperienceYears = 6,
+                    ApprovalStatus = VolunteerApprovalStatus.Approved,
+                    CVUrl = "https://example.com/cv/volunteer-9",
+                    ApprovedBy = SeedConstants.CoordinatorUser,
+                    ApprovedAt = SeedDate.AddDays(3),
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.Volunteer10,
+                    ExperienceYears = 3,
+                    ApprovalStatus = VolunteerApprovalStatus.Approved,
+                    CVUrl = "https://example.com/cv/volunteer-10",
+                    ApprovedBy = SeedConstants.CoordinatorUser,
+                    ApprovedAt = SeedDate.AddDays(7),
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.Volunteer11,
+                    ExperienceYears = 5,
+                    ApprovalStatus = VolunteerApprovalStatus.Approved,
+                    CVUrl = "https://example.com/cv/volunteer-11",
+                    ApprovedBy = SeedConstants.CoordinatorUser,
+                    ApprovedAt = SeedDate.AddDays(5),
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.Volunteer12,
+                    ExperienceYears = 2,
+                    ApprovalStatus = VolunteerApprovalStatus.Approved,
+                    CVUrl = "https://example.com/cv/volunteer-12",
+                    ApprovedBy = SeedConstants.CoordinatorUser,
+                    ApprovedAt = SeedDate.AddDays(8),
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.Volunteer13,
+                    ExperienceYears = 10,
+                    ApprovalStatus = VolunteerApprovalStatus.Approved,
+                    CVUrl = "https://example.com/cv/volunteer-13",
+                    ApprovedBy = SeedConstants.CoordinatorUser,
+                    ApprovedAt = SeedDate.AddDays(1),
+                    CreatedAt = SeedDate
+                },
+
+                new()
+                {
+                    Id = SeedConstants.Volunteer14,
+                    ExperienceYears = 4,
+                    ApprovalStatus = VolunteerApprovalStatus.Approved,
+                    CVUrl = "https://example.com/cv/volunteer-14",
+                    ApprovedBy = SeedConstants.CoordinatorUser,
+                    ApprovedAt = SeedDate.AddDays(4),
+                    CreatedAt = SeedDate
                 }
             ];
         }
@@ -502,6 +782,142 @@ namespace RescueHub.Infrastructure.SqlServer.Seeds
                     VolunteerId = SeedConstants.Volunteer4,
                     SkillId = SeedConstants.FirstAidSkill,
                     Level = 2
+                },
+
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer5,
+                    SkillId = SeedConstants.FirstAidSkill,
+                    Level = 4
+                },
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer5,
+                    SkillId = SeedConstants.MedicalSkill,
+                    Level = 5
+                },
+
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer6,
+                    SkillId = SeedConstants.SwimmingSkill,
+                    Level = 4
+                },
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer6,
+                    SkillId = SeedConstants.RescueSkill,
+                    Level = 3
+                },
+
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer7,
+                    SkillId = SeedConstants.LogisticsSkill,
+                    Level = 5
+                },
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer7,
+                    SkillId = SeedConstants.DrivingSkill,
+                    Level = 5
+                },
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer7,
+                    SkillId = SeedConstants.CommunicationSkill,
+                    Level = 4
+                },
+
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer8,
+                    SkillId = SeedConstants.CookingSkill,
+                    Level = 3
+                },
+
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer9,
+                    SkillId = SeedConstants.FirstAidSkill,
+                    Level = 4
+                },
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer9,
+                    SkillId = SeedConstants.CommunicationSkill,
+                    Level = 5
+                },
+
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer10,
+                    SkillId = SeedConstants.MedicalSkill,
+                    Level = 3
+                },
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer10,
+                    SkillId = SeedConstants.LogisticsSkill,
+                    Level = 4
+                },
+
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer11,
+                    SkillId = SeedConstants.DrivingSkill,
+                    Level = 4
+                },
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer11,
+                    SkillId = SeedConstants.RescueSkill,
+                    Level = 4
+                },
+
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer12,
+                    SkillId = SeedConstants.CookingSkill,
+                    Level = 4
+                },
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer12,
+                    SkillId = SeedConstants.FirstAidSkill,
+                    Level = 2
+                },
+
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer13,
+                    SkillId = SeedConstants.MedicalSkill,
+                    Level = 5
+                },
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer13,
+                    SkillId = SeedConstants.RescueSkill,
+                    Level = 5
+                },
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer13,
+                    SkillId = SeedConstants.SwimmingSkill,
+                    Level = 4
+                },
+
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer14,
+                    SkillId = SeedConstants.LogisticsSkill,
+                    Level = 3
+                },
+                new()
+                {
+                    VolunteerId = SeedConstants.Volunteer14,
+                    SkillId = SeedConstants.CommunicationSkill,
+                    Level = 4
                 }
             ];
         }
