@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace RescueHub.API.Controllers
 {
     [ApiController]
-    [Route("api/me")]
+    [Route("api")]
     [Authorize]
     public class DonationController : ControllerBase
     {
@@ -25,7 +25,7 @@ namespace RescueHub.API.Controllers
         }
 
         // Lấy danh sách Donation của User hiện tại
-        [HttpGet("donations")]
+        [HttpGet("me/donations")]
         public async Task<IActionResult> GetMyDonation(
             CancellationToken cancellationToken)
         {
@@ -50,7 +50,7 @@ namespace RescueHub.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("supplies")]
+        [HttpGet("me/supplies")]
         public async Task<IActionResult> GetMySupply(CancellationToken cancellationToken)
         {
             var result = await _sender.Send(new GetMySupplyQuery(), cancellationToken);
@@ -65,7 +65,7 @@ namespace RescueHub.API.Controllers
         }
 
         // Tạo donation mới
-        [HttpPost("donations")]
+        [HttpPost("me/donations")]
         public async Task<IActionResult> CreateDonation(
             [FromBody] CreateDonationRequest request,
             CancellationToken cancellationToken)
@@ -93,7 +93,7 @@ namespace RescueHub.API.Controllers
         }
 
         // Cập nhật thông tin của đơn donation
-        [HttpPatch("donations/{donationId:guid}")]
+        [HttpPatch("me/donations/{donationId:guid}")]
         public async Task<IActionResult> UpdateDonation(
             [FromBody] UpdateDonationRequest request,
             Guid donationId,
@@ -127,7 +127,7 @@ namespace RescueHub.API.Controllers
         }
 
         // --- BỔ SUNG: Hủy đơn donation ---
-        [HttpDelete("donations/{donationId:guid}")]
+        [HttpDelete("me/donations/{donationId:guid}")]
         public async Task<IActionResult> CancelDonation(
             Guid donationId,
             CancellationToken cancellationToken)
@@ -151,7 +151,7 @@ namespace RescueHub.API.Controllers
         }
 
         [Authorize(Roles = "Coordinator")]
-        [HttpGet("donations/coordinator")]
+        [HttpGet("donations")]
         public async Task<IActionResult> GetAllDonations(CancellationToken cancellationToken)
         {
             var coordinatorId = GetCurrentUserId();
