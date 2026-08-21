@@ -130,9 +130,23 @@ namespace RescueHub.Infrastructure.SqlServer.Repositories
 
         public async Task DeleteAsync(ReliefTask task, CancellationToken cancellationToken = default)
         {
-            var dataModel = await _context.ReliefTasks.FindAsync(new object[] { task.Id }, cancellationToken);
+            var dataModel = await _context.ReliefTasks
+                .Include(x => x.TaskSkills)
+                .Include(x => x.Assignments)
+                .FirstOrDefaultAsync(x => x.Id == task.Id, cancellationToken);
+                
             if (dataModel != null)
             {
+                if (dataModel.TaskSkills != null && dataModel.TaskSkills.Any())
+                {
+                    _context.TaskSkills.RemoveRange(dataModel.TaskSkills);
+                }
+                
+                if (dataModel.Assignments != null && dataModel.Assignments.Any())
+                {
+                    _context.TaskAssignments.RemoveRange(dataModel.Assignments);
+                }
+
                 _context.ReliefTasks.Remove(dataModel);
             }
         }
