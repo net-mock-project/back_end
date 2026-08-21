@@ -47,7 +47,6 @@ namespace RescueHub.Domain.Services
             if (volunteer == null || volunteer.DeletedAt != null)
                 return null;
 
-            // Chỉ trả về nếu cùng khu vực quản lý
             if (!string.Equals(volunteer.Province, coordinator.Province, StringComparison.OrdinalIgnoreCase))
                 return null;
 
@@ -63,7 +62,6 @@ namespace RescueHub.Domain.Services
         {
             var existingVolunteer = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
 
-            // 1. Chặn nếu hồ sơ đang chờ duyệt hoặc đã được duyệt chính thức
             if (existingVolunteer != null && existingVolunteer.DeletedAt == null &&
                (existingVolunteer.ApprovalStatus == VolunteerApprovalStatus.Pending ||
                 existingVolunteer.ApprovalStatus == VolunteerApprovalStatus.Approved))
@@ -75,19 +73,18 @@ namespace RescueHub.Domain.Services
                 new VolunteerSkill(volunteerId, s.SkillId, s.Level)
             ).ToList();
 
-            // 2. Khôi phục nếu đã xóa mềm HOẶC nộp lại đơn mới sau khi bị Rejected
             if (existingVolunteer != null && (existingVolunteer.DeletedAt != null || existingVolunteer.ApprovalStatus == VolunteerApprovalStatus.Rejected))
             {
                 var reactivatedVolunteer = new Volunteer(
                     volunteerId,
                     experienceYears,
-                    VolunteerApprovalStatus.Pending, // Reset về chờ duyệt
+                    VolunteerApprovalStatus.Pending,
                     cvUrl,
                     approvedBy: null,
                     approvedAt: null,
                     createdAt: existingVolunteer.CreatedAt,
                     updatedAt: DateTime.UtcNow,
-                    deletedAt: null, // Reset xóa mềm
+                    deletedAt: null,
                     skills: volunteerSkills,
                     fullName: existingVolunteer.FullName,
                     email: existingVolunteer.Email,
@@ -99,7 +96,6 @@ namespace RescueHub.Domain.Services
                 return reactivatedVolunteer;
             }
 
-            // 3. Tạo mới hoàn toàn nếu chưa từng có bản ghi
             var volunteer = new Volunteer(
                 volunteerId,
                 experienceYears,
@@ -127,6 +123,10 @@ namespace RescueHub.Domain.Services
             if (volunteer == null || volunteer.DeletedAt != null)
                 return null;
 
+            // Chặn không cho tự sửa nếu đã là Approved chính thức
+            if (volunteer.ApprovalStatus == VolunteerApprovalStatus.Approved)
+                return null;
+
             var volunteerSkills = skills.Select(s =>
                 new VolunteerSkill(volunteerId, s.SkillId, s.Level)
             ).ToList();
@@ -134,10 +134,10 @@ namespace RescueHub.Domain.Services
             var updatedVolunteer = new Volunteer(
                 volunteer.VolunteerId,
                 experienceYears,
-                volunteer.ApprovalStatus,
+                VolunteerApprovalStatus.Pending, // Reset trạng thái về Pending để Coordinator duyệt lại
                 cvUrl,
-                volunteer.ApprovedBy,
-                volunteer.ApprovedAt,
+                null,                            // Xóa thông tin người duyệt cũ
+                null,                            // Xóa thời gian duyệt cũ
                 volunteer.CreatedAt,
                 DateTime.UtcNow,
                 volunteer.DeletedAt,
@@ -284,7 +284,6 @@ namespace RescueHub.Domain.Services
             if (coordinator == null || targetUser == null)
                 return null;
 
-            // Kiểm tra phân quyền theo Tỉnh/Thành
             if (string.IsNullOrWhiteSpace(coordinator.Province) ||
                 string.IsNullOrWhiteSpace(targetUser.Province) ||
                 !string.Equals(coordinator.Province.Trim(), targetUser.Province.Trim(), StringComparison.OrdinalIgnoreCase))
@@ -292,14 +291,12 @@ namespace RescueHub.Domain.Services
                 return null;
             }
 
-            // Lấy Role Volunteer từ Database
             var volunteerRole = await _roleRepository.GetByNameAsync("Volunteer", cancellationToken);
             if (volunteerRole == null)
                 return null;
 
             var existingVolunteer = await _volunteerRepository.GetByIdAsync(targetUserId, cancellationToken);
 
-            // Chỉ chặn nếu người dùng ĐÃ LÀ Tình nguyện viên chính thức đang hoạt động
             if (existingVolunteer != null &&
                 existingVolunteer.DeletedAt == null &&
                 existingVolunteer.ApprovalStatus == VolunteerApprovalStatus.Approved)
@@ -314,23 +311,21 @@ namespace RescueHub.Domain.Services
             var volunteer = new Volunteer(
                 targetUserId,
                 experienceYears,
-                VolunteerApprovalStatus.Approved, // Coordinator chủ động tạo -> Approved luôn
+                VolunteerApprovalStatus.Approved,
                 cvUrl,
                 coordinatorId,
                 DateTime.UtcNow,
                 existingVolunteer?.CreatedAt ?? DateTime.UtcNow,
                 DateTime.UtcNow,
-                null, // Reset xóa mềm nếu có
+                null,
                 volunteerSkills);
 
             if (existingVolunteer != null)
             {
-                // Đã có bản ghi (từng bị Rejected, Pending, hoặc Soft-deleted) -> Cập nhật lại
                 await _volunteerRepository.UpdateAsync(volunteer, cancellationToken);
             }
             else
             {
-                // Chưa từng có bản ghi -> Thêm mới
                 await _volunteerRepository.AddAsync(volunteer, cancellationToken);
             }
 
