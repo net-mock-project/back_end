@@ -2,7 +2,11 @@ using Mapster;
 using MediatR;
 using RescueHub.Application.Common.Interfaces;
 using RescueHub.Application.Contracts.ReliefRequests;
+using RescueHub.Domain.Entities;
+using RescueHub.Domain.Interfaces.AuditLogs;
+using RescueHub.Domain.Interfaces.Notifications;
 using RescueHub.Domain.Interfaces.ReliefRequests;
+using System.Text.Json;
 
 namespace RescueHub.Application.Features.ReliefRequests.Commands
 {
@@ -23,10 +27,19 @@ namespace RescueHub.Application.Features.ReliefRequests.Commands
         private readonly IUnitOfWork _unitOfWork;
         private readonly IReliefRequestService _service;
 
-        public CreateReliefRequestCommandHandler(IUnitOfWork unitOfWork, IReliefRequestService service)
+        private readonly IAuditLogService _auditLogService;
+        private readonly INotificationService _notificationService;
+
+        public CreateReliefRequestCommandHandler(
+            IUnitOfWork unitOfWork, 
+            IReliefRequestService service,
+            IAuditLogService auditLogService,
+            INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _service = service;
+            _auditLogService = auditLogService;
+            _notificationService = notificationService;
         }
 
         public async Task<ReliefRequestDto> Handle(CreateReliefRequestCommand request, CancellationToken cancellationToken)
@@ -49,6 +62,25 @@ namespace RescueHub.Application.Features.ReliefRequests.Commands
                     cancellationToken);
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                await _auditLogService.CreateAsync(
+                    new AuditLog(
+                        request.RequesterId,
+                        "Create",
+                        nameof(ReliefRequest),
+                        entity.Id,
+                        newValue: JsonSerializer.Serialize(new
+                        {
+                            entity.Id,
+                            entity.Title,
+                            entity.Description,
+                            entity.UrgencyLevel,
+                            entity.EstimatedAffectedPeople,
+                            entity.EstimatedAffectedRadiusKm
+                        })),
+                    cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
                 await _unitOfWork.CommitAsync(cancellationToken);
 
                 return entity.Adapt<ReliefRequestDto>();
