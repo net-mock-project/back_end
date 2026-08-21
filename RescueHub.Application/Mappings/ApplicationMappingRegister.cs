@@ -32,7 +32,9 @@ namespace RescueHub.Application.Mappings
 
             config.NewConfig<Volunteer, VolunteerProfileDto>()
                 .Map(dest => dest.Id, src => src.VolunteerId)
-                .Map(dest => dest.Skills, src => src.Skills);
+                .Map(dest => dest.Skills, src => src.Skills)
+                .Map(dest => dest.Latitude, src => src.Location != null ? src.Location.Latitude : (double?)null)
+                .Map(dest => dest.Longitude, src => src.Location != null ? src.Location.Longitude : (double?)null);
             config.NewConfig<VolunteerSkill, VolunteerSkillDto>();
 
 

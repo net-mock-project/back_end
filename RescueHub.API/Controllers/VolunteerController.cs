@@ -142,7 +142,6 @@ namespace RescueHub.API.Controllers
 
         [HttpGet("api/coordinator/volunteers")]
         [Tags("Coordinator - Volunteers")]
-        [Authorize(Roles = "Coordinator")]
         public async Task<IActionResult> GetApprovedVolunteerProfiles(
             [FromQuery] VolunteerQueryRequest request,
             CancellationToken cancellationToken)
